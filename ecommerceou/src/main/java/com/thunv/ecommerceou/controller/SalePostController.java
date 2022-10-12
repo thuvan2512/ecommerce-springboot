@@ -108,6 +108,97 @@ public class SalePostController {
                 new ModelResponse(code,ms,list)
         );
     }
+    @GetMapping(value = "/stats-by-category")
+    public ResponseEntity<ModelResponse> getStatsByCategory(){
+        String ms = "Get stats by category successfully";
+        String code = "200";
+        List<Object[]> list = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            list = this.salePostService.getStatsSalePostByCategory();
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
+    @GetMapping(value = "/stats-by-category/{agencyID}")
+    public ResponseEntity<ModelResponse> getStatsByCategoryByAgency(@PathVariable(value = "agencyID") String agencyID){
+        String ms = "Get stats by category successfully";
+        String code = "200";
+        List<Object[]> list = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
+            list = this.salePostService.getStatsSalePostByCategory(agency);
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
+    @GetMapping(value = "/stats-revenue-month-by-year/{agencyID}/{year}")
+    public ResponseEntity<ModelResponse> getStatsRevenueMonthByYear(@PathVariable(value = "agencyID") String agencyID,
+                                                               @PathVariable(value = "year") String year){
+        String ms = "Get stats revenue successfully";
+        String code = "200";
+        List<Object[]> list = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
+            list = this.salePostService.getStatsRevenueMonthByYear(agency,Integer.parseInt(year));
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
+    @GetMapping(value = "/stats-revenue-quarter-by-year/{agencyID}/{year}")
+    public ResponseEntity<ModelResponse> getStatsRevenueQuarterByYear(@PathVariable(value = "agencyID") String agencyID,
+                                                               @PathVariable(value = "year") String year){
+        String ms = "Get stats revenue successfully";
+        String code = "200";
+        List<Object[]> list = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
+            list = this.salePostService.getStatsRevenueQuarterByYear(agency,Integer.parseInt(year));
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
+    @GetMapping(value = "/stats-revenue-by-year/{agencyID}/")
+    public ResponseEntity<ModelResponse> getStatsRevenueByYear(@PathVariable(value = "agencyID") String agencyID){
+        String ms = "Get stats revenue successfully";
+        String code = "200";
+        List<Object[]> list = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
+            list = this.salePostService.getStatsRevenueYear(agency);
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
     @GetMapping(value = "/wish-list/{userID}")
     public ResponseEntity<ModelResponse> getWishListByUserID(@PathVariable(value = "userID") String userID){
         String ms = "Get all sale post like by user successfully";

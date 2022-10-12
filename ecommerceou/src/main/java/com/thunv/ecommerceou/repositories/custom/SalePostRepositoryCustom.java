@@ -12,5 +12,10 @@ public interface SalePostRepositoryCustom {
     List<SalePost> getListSalePostLikeByUser(User user);
     List<SalePost> getListSalePostUnpublished(Agency agency);
     List<SalePost> getListSalePostPublished(Agency agency);
+    List<Object[]> getStatsSalePostByCategoryByAgency(Agency agency);
+    List<Object[]> getStatsSalePostByCategory();
+    List<Object[]> getStatsRevenueMonthByYear(Agency agency, int year);
+    List<Object[]> getStatsRevenueQuarterByYear(Agency agency, int year);
+    List<Object[]> getStatsRevenueYear(Agency agency);
 
 }

@@ -1,10 +1,7 @@
 package com.thunv.ecommerceou.repositories.impl;
 
 import com.thunv.ecommerceou.dto.SearchSalePostDTO;
-import com.thunv.ecommerceou.models.pojo.Agency;
-import com.thunv.ecommerceou.models.pojo.LikePost;
-import com.thunv.ecommerceou.models.pojo.SalePost;
-import com.thunv.ecommerceou.models.pojo.User;
+import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.repositories.custom.SalePostRepositoryCustom;
 import com.thunv.ecommerceou.utils.Utils;
 import org.hibernate.Session;
@@ -160,6 +157,117 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         query.where(predicates.toArray(new Predicate[]{}));
         query.select(rootPost);
         query.orderBy(builder.desc(rootPost.get("createdDate")));
+        Query q = session.createQuery(query);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Object[]> getStatsSalePostByCategoryByAgency(Agency agency) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> query = builder.createQuery(Object[].class);
+        Root rootCate = query.from(Category.class);
+        Root rootPost = query.from(SalePost.class);
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate p1 = builder.equal(rootPost.get("agency").get("id"), agency.getId());
+        predicates.add(p1);
+        Predicate p2 = builder.equal(rootPost.get("category").get("id"), rootCate.get("id"));
+        predicates.add(p2);
+        query.where(predicates.toArray(new Predicate[]{}));
+        query.multiselect(rootCate.get("name"), builder.count(rootPost.get("id")));
+        query.groupBy(rootCate.get("name"));
+        Query q = session.createQuery(query);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Object[]> getStatsSalePostByCategory() {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> query = builder.createQuery(Object[].class);
+        Root rootCate = query.from(Category.class);
+        Root rootPost = query.from(SalePost.class);
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate p1 = builder.equal(rootPost.get("isActive").as(Integer.class), 1);
+        predicates.add(p1);
+        Predicate p2 = builder.equal(rootPost.get("category").get("id"), rootCate.get("id"));
+        predicates.add(p2);
+        query.where(predicates.toArray(new Predicate[]{}));
+        query.multiselect(rootCate.get("name"), builder.count(rootPost.get("id")));
+        query.groupBy(rootCate.get("name"));
+        Query q = session.createQuery(query);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Object[]> getStatsRevenueMonthByYear(Agency agency, int year) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> query = builder.createQuery(Object[].class);
+        Root rootOrderDetail = query.from(OrderDetail.class);
+        Root rootOrder = query.from(Orders.class);
+        Root rootOrderAgency = query.from(OrderAgency.class);
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate p1 = builder.equal(rootOrderAgency.get("agency").get("id"), agency.getId());
+        predicates.add(p1);
+        Predicate p2 = builder.equal(rootOrder.get("id"), rootOrderAgency.get("orders").get("id"));
+        predicates.add(p2);
+        Predicate p3 = builder.equal(rootOrderDetail.get("orderAgency").get("id"), rootOrderAgency.get("id"));
+        predicates.add(p3);
+        Predicate p5 = builder.equal(builder.function("YEAR", Integer.class, rootOrder.get("createdDate")), year);
+        predicates.add(p5);
+        query.where(predicates.toArray(new Predicate[]{}));
+        query.multiselect(builder.function("MONTH", Integer.class, rootOrder.get("createdDate")), builder.sum(builder.prod(rootOrderDetail.get("itemPost").get("unitPrice"), rootOrderDetail.get("quantity"))));
+        query.groupBy(builder.function("MONTH", Integer.class, rootOrder.get("createdDate")));
+        query.orderBy(builder.asc(builder.function("MONTH", Integer.class, rootOrder.get("createdDate"))));
+        Query q = session.createQuery(query);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Object[]> getStatsRevenueQuarterByYear(Agency agency,int year) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> query = builder.createQuery(Object[].class);
+        Root rootOrderDetail = query.from(OrderDetail.class);
+        Root rootOrder = query.from(Orders.class);
+        Root rootOrderAgency = query.from(OrderAgency.class);
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate p1 = builder.equal(rootOrderAgency.get("agency").get("id"), agency.getId());
+        predicates.add(p1);
+        Predicate p2 = builder.equal(rootOrder.get("id"), rootOrderAgency.get("orders").get("id"));
+        predicates.add(p2);
+        Predicate p3 = builder.equal(rootOrderDetail.get("orderAgency").get("id"), rootOrderAgency.get("id"));
+        predicates.add(p3);
+        Predicate p5 = builder.equal(builder.function("YEAR", Integer.class, rootOrder.get("createdDate")), year);
+        predicates.add(p5);
+        query.where(predicates.toArray(new Predicate[]{}));
+        query.multiselect(builder.function("QUARTER", Integer.class, rootOrder.get("createdDate")), builder.sum(builder.prod(rootOrderDetail.get("itemPost").get("unitPrice"), rootOrderDetail.get("quantity"))));
+        query.groupBy(builder.function("QUARTER", Integer.class, rootOrder.get("createdDate")));
+        query.orderBy(builder.asc(builder.function("QUARTER", Integer.class, rootOrder.get("createdDate"))));
+        Query q = session.createQuery(query);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Object[]> getStatsRevenueYear(Agency agency) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> query = builder.createQuery(Object[].class);
+        Root rootOrderDetail = query.from(OrderDetail.class);
+        Root rootOrder = query.from(Orders.class);
+        Root rootOrderAgency = query.from(OrderAgency.class);
+        List<Predicate> predicates = new ArrayList<>();
+        Predicate p1 = builder.equal(rootOrderAgency.get("agency").get("id"), agency.getId());
+        predicates.add(p1);
+        Predicate p2 = builder.equal(rootOrder.get("id"), rootOrderAgency.get("orders").get("id"));
+        predicates.add(p2);
+        Predicate p3 = builder.equal(rootOrderDetail.get("orderAgency").get("id"), rootOrderAgency.get("id"));
+        predicates.add(p3);
+        query.where(predicates.toArray(new Predicate[]{}));
+        query.multiselect(builder.function("YEAR", Integer.class, rootOrder.get("createdDate")), builder.sum(builder.prod(rootOrderDetail.get("itemPost").get("unitPrice"), rootOrderDetail.get("quantity"))));
+        query.groupBy(builder.function("YEAR", Integer.class, rootOrder.get("createdDate")));
+        query.orderBy(builder.asc(builder.function("YEAR", Integer.class, rootOrder.get("createdDate"))));
         Query q = session.createQuery(query);
         return q.getResultList();
     }

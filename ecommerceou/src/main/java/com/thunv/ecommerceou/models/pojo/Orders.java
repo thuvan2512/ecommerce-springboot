@@ -1,6 +1,7 @@
 package com.thunv.ecommerceou.models.pojo;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,11 +34,12 @@ public class Orders  {
     @Getter @Setter
     private PaymentType paymentType;
     @ManyToOne
-    @JoinColumn(name = "order_state",referencedColumnName = "id")
+    @JoinColumn(name = "author",referencedColumnName = "id")
     @Getter @Setter
-    private OrderState orderState;
+    private User author;
     @OneToMany(mappedBy = "orders",cascade = CascadeType.REMOVE, orphanRemoval = true)
     @Getter @Setter
+    @JsonIgnore
     private Set<OrderAgency> orderAgencySet;
 
     public Orders () {

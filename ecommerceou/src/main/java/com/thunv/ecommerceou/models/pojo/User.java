@@ -82,6 +82,10 @@ public class User {
     @OneToMany(mappedBy = "author",cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIgnore
     @Getter @Setter
+    private Set<Orders> ordersSet;
+    @OneToMany(mappedBy = "author",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    @Getter @Setter
     private Set<LikePost> likePostSet;
     @OneToMany(mappedBy = "author",cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIgnore
