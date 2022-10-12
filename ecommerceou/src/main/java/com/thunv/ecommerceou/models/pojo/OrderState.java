@@ -23,7 +23,7 @@ public class OrderState {
     @OneToMany(mappedBy = "orderState")
     @JsonIgnore
     @Getter @Setter
-    private Set<Orders> orderSet;
+    private Set<OrderAgency> orderAgencySet;
 
     public OrderState() {
     }

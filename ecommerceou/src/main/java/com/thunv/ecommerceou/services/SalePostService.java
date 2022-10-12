@@ -24,10 +24,10 @@ public interface SalePostService {
     SalePost updateSalePost(SalePost salePost);
     boolean deleteSalePost(int postID);
     Integer getTotalPageSalePost();
-//    List<Object[]> getStatsSalePostByCategory(int agencyID);
-//    List<Object[]> getStatsSalePostByCategory();
-//    List<Object[]> getStatsRevenueMonthByYear(int year,int agencyID);
-//    List<Object[]> getStatsRevenueQuarterByYear(int year,int agencyID);
-//    List<Object[]> getStatsRevenueYear(int agencyID);
+    List<Object[]> getStatsSalePostByCategory(Agency agency);
+    List<Object[]> getStatsSalePostByCategory();
+    List<Object[]> getStatsRevenueMonthByYear(Agency agency, int year);
+    List<Object[]> getStatsRevenueQuarterByYear(Agency agency,int year);
+    List<Object[]> getStatsRevenueYear(Agency agency);
 
 }

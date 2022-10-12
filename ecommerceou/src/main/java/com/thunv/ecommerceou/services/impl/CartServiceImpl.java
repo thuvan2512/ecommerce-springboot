@@ -173,11 +173,11 @@ public class CartServiceImpl implements CartService {
             }
             if (cartItemList.size() > 0){
                 Orders orders = new Orders();
-                orders.setOrderState(this.orderStateService.getOrderStateByID(1));
                 orders.setPaymentType(paymentType);
                 orders.setCreatedDate(new Date());
                 orders.setTotalPrice(this.getTotalPriceInCart(cart));
                 orders.setPaymentState(0);
+                orders.setAuthor(user);
                 this.ordersRepository.save(orders);
                 Map<Integer, List<CartItem>> groupItemByAgency =
                         cartItemList.stream().collect(Collectors.groupingBy(item -> item.getItemPost().getSalePost().getAgency().getId()));
@@ -185,6 +185,7 @@ public class CartServiceImpl implements CartService {
                     OrderAgency orderAgency = new OrderAgency();
                     orderAgency.setAgency(this.agencyService.getAgencyByID(v.getKey()));
                     orderAgency.setOrders(orders);
+                    orderAgency.setOrderState(this.orderStateService.getOrderStateByID(1));
                     this.ordersAgencyRepository.save(orderAgency);
                     for (CartItem cartItem: v.getValue()){
                         OrderDetail orderDetail = new OrderDetail();
