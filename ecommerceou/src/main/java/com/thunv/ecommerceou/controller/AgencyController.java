@@ -73,6 +73,23 @@ public class AgencyController {
                 new ModelResponse(code,ms,list)
         );
     }
+    @GetMapping(value = "/top-agency/{top}")
+    public ResponseEntity<ModelResponse> getTopAgency(@PathVariable(value = "top") String top){
+        String ms = "Get top agency successfully";
+        String code = "200";
+        List<Object[]> list = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            list = this.agencyService.getTopAgency(Integer.parseInt(top));
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
     @GetMapping(value = "/star-average/{agencyID}")
     public ResponseEntity<ModelResponse> getStarAverageByAgency(@PathVariable(value = "agencyID") String agencyID){
         String ms = "Get avg star by agency successfully";

@@ -1,10 +1,7 @@
 package com.thunv.ecommerceou.repositories.impl;
 
 import com.thunv.ecommerceou.dto.SearchAgencyDTO;
-import com.thunv.ecommerceou.models.pojo.Agency;
-import com.thunv.ecommerceou.models.pojo.FollowAgency;
-import com.thunv.ecommerceou.models.pojo.LikePost;
-import com.thunv.ecommerceou.models.pojo.User;
+import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.repositories.custom.AgencyRepositoryCustom;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -74,5 +71,24 @@ public class AgencyRepositoryImpl implements AgencyRepositoryCustom {
         query.where(predicates.toArray(new Predicate[]{}));
         Query q = session.createQuery(query);
         return q.getResultList();
+    }
+
+    @Override
+    public List<Object[]> getTopAgency(int top) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> criteriaQuery = criteriaBuilder.createQuery(Object[].class);
+        Root root = criteriaQuery.from(Agency.class);
+        Root rootPost = criteriaQuery.from(SalePost.class);
+        Root rootLike = criteriaQuery.from(LikePost.class);
+        criteriaQuery.where(criteriaBuilder.equal(root.get("isCensored").as(Integer.class), 1),
+                criteriaBuilder.equal(root.get("isActive").as(Integer.class), 1),
+                criteriaBuilder.equal(rootPost.get("agency").get("id"), root.get("id")),
+                criteriaBuilder.equal(rootPost.get("id"), rootLike.get("salePost")));
+        criteriaQuery.multiselect(root, criteriaBuilder.count(rootLike.get("id")).as(Integer.class));
+        criteriaQuery.groupBy(root.get("id"));
+        Query query = session.createQuery(criteriaQuery);
+        query.setMaxResults(top);
+        return query.getResultList();
     }
 }

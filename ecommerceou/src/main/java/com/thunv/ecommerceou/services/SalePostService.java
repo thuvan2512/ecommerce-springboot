@@ -23,6 +23,7 @@ public interface SalePostService {
     SalePost createSalePost(SalePostCreateDTO salePostCreateDTO);
     SalePost updateSalePost(SalePost salePost);
     boolean deleteSalePost(int postID);
+    List<Object[]> getTopSeller(int top);
     Integer getTotalPageSalePost();
     List<Object[]> getStatsSalePostByCategory(Agency agency);
     List<Object[]> getStatsSalePostByCategory();

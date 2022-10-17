@@ -152,6 +152,16 @@ public class SalePostServiceImpl implements SalePostService {
     }
 
     @Override
+    public List<Object[]> getTopSeller(int top) throws RuntimeException {
+        try {
+            return this.salePostRepository.getTopSeller(top);
+        } catch (Exception ex) {
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
     public Integer countSalePost() throws RuntimeException {
         try {
             return Math.toIntExact(this.salePostRepository.count());
