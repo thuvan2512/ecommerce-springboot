@@ -41,6 +41,16 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    public List<Object[]> getTopAgency(int top) throws RuntimeException{
+        try {
+            return this.agencyRepository.getTopAgency(top);
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
     public List<Agency> searchAgency(SearchAgencyDTO searchAgencyDTO)  throws RuntimeException{
         try {
             return this.agencyRepository.searchAgency(searchAgencyDTO);

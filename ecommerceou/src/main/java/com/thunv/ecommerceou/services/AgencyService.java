@@ -11,6 +11,7 @@ import java.util.List;
 public interface AgencyService {
     Agency getAgencyByID(int agencyID);
     List<Agency> getAllAgency();
+    List<Object[]> getTopAgency(int top);
     List<Agency> searchAgency(SearchAgencyDTO searchAgencyDTO);
     List<Agency> getListAgencyFollowByUser(User user);
     Integer countAgency();

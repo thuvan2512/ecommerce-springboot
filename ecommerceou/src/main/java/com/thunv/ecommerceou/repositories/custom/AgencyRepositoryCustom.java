@@ -9,4 +9,5 @@ import java.util.List;
 public interface AgencyRepositoryCustom{
     List<Agency> searchAgency(SearchAgencyDTO searchAgencyDTO);
     List<Agency> getListAgencyFollowByUser(User user);
+    List<Object[]> getTopAgency(int top);
 }

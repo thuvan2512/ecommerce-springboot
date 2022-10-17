@@ -62,6 +62,23 @@ public class ItemController {
                 new ModelResponse(code,ms,list)
         );
     }
+    @GetMapping(value = "/top-seller/{top}")
+    public ResponseEntity<ModelResponse> getTopSellerItem(@PathVariable(value = "top") String top){
+        String ms = "Get top seller items successfully";
+        String code = "200";
+        List<Object[]> list = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            list = this.salePostService.getTopSeller(Integer.parseInt(top));
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
     @GetMapping(value = "/{postID}/all")
     public ResponseEntity<ModelResponse> getAllItemOfSalePost(@PathVariable(value = "postID") String postID){
         String ms = "Get all items of post successfully";

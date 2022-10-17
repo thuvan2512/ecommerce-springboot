@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface SalePostRepositoryCustom {
     List<SalePost> searchSalePost(SearchSalePostDTO searchSalePostDTO);
+    public List<Object[]> getTopSeller(int top);
     List<SalePost> getListSalePostLikeByUser(User user);
     List<SalePost> getListSalePostUnpublished(Agency agency);
     List<SalePost> getListSalePostPublished(Agency agency);
