@@ -4,10 +4,12 @@ import com.thunv.ecommerceou.dto.SalePostCreateDTO;
 import com.thunv.ecommerceou.dto.SalePostUpdateDTO;
 import com.thunv.ecommerceou.dto.SearchSalePostDTO;
 import com.thunv.ecommerceou.models.pojo.Agency;
+import com.thunv.ecommerceou.models.pojo.CommentPost;
 import com.thunv.ecommerceou.models.pojo.SalePost;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.SalePostRepository;
 import com.thunv.ecommerceou.services.CategoryService;
+import com.thunv.ecommerceou.services.CommentService;
 import com.thunv.ecommerceou.services.SalePostService;
 import com.thunv.ecommerceou.services.SellStatusService;
 import com.thunv.ecommerceou.utils.Utils;
@@ -28,6 +30,8 @@ public class SalePostServiceImpl implements SalePostService {
     private SellStatusService sellStatusService;
     @Autowired
     private Environment env;
+    @Autowired
+    private CommentService commentService;
     @Autowired
     private Utils utils;
 
@@ -165,6 +169,29 @@ public class SalePostServiceImpl implements SalePostService {
     public Integer countSalePost() throws RuntimeException {
         try {
             return Math.toIntExact(this.salePostRepository.count());
+        } catch (Exception ex) {
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
+    public double getAverageStarRateOfSalePost(int postID) throws RuntimeException{
+        try {
+            SalePost salePost = this.getSalePostByID(postID);
+            List<CommentPost> commentPostList = this.commentService.getListCommentByPost(salePost);
+            int countRate = 0;
+            int countStar = 0;
+            for (CommentPost cp: commentPostList) {
+                if (cp.getStarRate() != null) {
+                    countStar += cp.getStarRate();
+                    countRate++;
+                }
+            }
+            if (countStar == 0) {
+                return 0;
+            }
+            return (countStar * 1.0 )/ countRate;
         } catch (Exception ex) {
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);
