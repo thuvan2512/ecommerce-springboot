@@ -23,6 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
 
 @RestController
@@ -77,13 +78,12 @@ public class AuthenticationController {
     public ResponseEntity<ModelResponse> loginGoogle(HttpServletRequest request) throws IOException {
         String code = request.getParameter("code");
         System.out.println(code);
-        String ms = "login google successfully";
-        String codeRes = "200";
+//        String ms = "login google successfully";
+//        String codeRes = "200";
 
         if (code == null || code.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ModelResponse("400","Get auth token failed","" )
-            );
+            String msg = "Get%20auth%20token%20failed";
+            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
         }
         String accessToken = googleUtils.getToken(code);
         GoogleEntity googleEntity = googleUtils.getUserInfo(accessToken);
@@ -91,27 +91,23 @@ public class AuthenticationController {
             this.googleUtils.createUser(googleEntity);
             UserDetails userDetail = googleUtils.buildUser(this.userService.loadUserByEmail(googleEntity.getEmail()).get(0));
             final String token = jwtTokenUtils.generateToken(userDetail);
-            final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
-            String ex = this.utils.getDateFormatter().format(expirationDate);
-
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
-            );
+//            final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
+//            String ex = this.utils.getDateFormatter().format(expirationDate);
+            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
         } else {
             int auth = this.userService.loadUserByEmail(googleEntity.getEmail()).get(0).getAuthProvider().getId();
             if (auth == 2) {
                 UserDetails userDetail = googleUtils.buildUser(this.userService.loadUserByEmail(googleEntity.getEmail()).get(0));
                 final String token = jwtTokenUtils.generateToken(userDetail);
-                final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
-                String ex = this.utils.getDateFormatter().format(expirationDate);
-
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
-                );
+//                final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
+//                String ex = this.utils.getDateFormatter().format(expirationDate);
+                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
+//                return ResponseEntity.status(HttpStatus.OK).body(
+//                        new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
+//                );
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ModelResponse("400","Email already exist in this system", "")
-                );
+                String msg = "Email%20already%20exist%20in%20this%20system";
+                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
             }
         }
     }
@@ -122,36 +118,29 @@ public class AuthenticationController {
         try {
             accessToken = facebookUtils.getToken(code);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ModelResponse("400","Get auth token failed","" )
-            );
+            String msg = "Get%20auth%20token%20failed";
+            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
         }
         com.restfb.types.User facebookInfo = facebookUtils.getUserInfo(accessToken);
         if (this.userService.checkExistEmail(facebookInfo.getEmail()) != true) {
             this.facebookUtils.createUser(facebookInfo);
             UserDetails userDetail = this.facebookUtils.buildUser(this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0));
             final String token = jwtTokenUtils.generateToken(userDetail);
-            final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
-            String ex = this.utils.getDateFormatter().format(expirationDate);
-
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
-            );
+//            final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
+//            String ex = this.utils.getDateFormatter().format(expirationDate);
+            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
+//            return ResponseEntity.status(HttpStatus.OK).body(
+//                    new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
+//            );
         } else {
             int auth = this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0).getAuthProvider().getId();
             if (auth == 3) {
                 UserDetails userDetail = this.facebookUtils.buildUser(this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0));
                 final String token = jwtTokenUtils.generateToken(userDetail);
-                final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
-                String ex = this.utils.getDateFormatter().format(expirationDate);
-
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
-                );
+                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ModelResponse("400","Email already exist in this system", "")
-                );
+                String msg = "Email%20already%20exist%20in%20this%20system";
+                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
             }
         }
     }

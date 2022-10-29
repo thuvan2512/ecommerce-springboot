@@ -108,6 +108,24 @@ public class SalePostController {
                 new ModelResponse(code,ms,list)
         );
     }
+    @GetMapping(value = "/get-star-average-rate/{postID}")
+    public ResponseEntity<ModelResponse> getStarAverage(@PathVariable(value = "postID") String postID){
+        String ms = "Get star average rate successfully";
+        String code = "200";
+        HttpStatus status = HttpStatus.OK;
+        double starAvg;
+        try {
+            starAvg = this.salePostService.getAverageStarRateOfSalePost(Integer.parseInt(postID));
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            starAvg = 0;
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,starAvg)
+        );
+    }
     @GetMapping(value = "/stats-by-category")
     public ResponseEntity<ModelResponse> getStatsByCategory(){
         String ms = "Get stats by category successfully";

@@ -20,6 +20,7 @@ public interface SalePostService {
     SalePost publishSalePost(SalePost salePost);
     SalePost unPublishSalePost(SalePost salePost);
     Integer countSalePost();
+    double getAverageStarRateOfSalePost(int postID);
     SalePost createSalePost(SalePostCreateDTO salePostCreateDTO);
     SalePost updateSalePost(SalePost salePost);
     boolean deleteSalePost(int postID);
