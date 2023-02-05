@@ -20,6 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 //})
 public class EcommerceouApplication {
 	public static void main(String[] args) {
+//		System.out.println("abc");
 //		Timer t = new Timer();
 //		TimerTask tt = new TimerTask() {
 //			@Override
