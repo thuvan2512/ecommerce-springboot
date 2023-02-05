@@ -83,6 +83,7 @@ public class AgencyRepositoryImpl implements AgencyRepositoryCustom {
         Root rootLike = criteriaQuery.from(LikePost.class);
         criteriaQuery.where(criteriaBuilder.equal(root.get("isCensored").as(Integer.class), 1),
                 criteriaBuilder.equal(root.get("isActive").as(Integer.class), 1),
+                criteriaBuilder.equal(rootLike.get("state").as(Integer.class), 1),
                 criteriaBuilder.equal(rootPost.get("agency").get("id"), root.get("id")),
                 criteriaBuilder.equal(rootPost.get("id"), rootLike.get("salePost")));
         criteriaQuery.multiselect(root, criteriaBuilder.count(rootLike.get("id")).as(Integer.class));
