@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/api/censorship")
 public class CensorshipAgencyController {
     @Autowired
