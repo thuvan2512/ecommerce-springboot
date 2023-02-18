@@ -6,7 +6,9 @@ import com.thunv.ecommerceou.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -22,13 +24,32 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> getAllCategory() throws RuntimeException{
         try {
-            return this.categoryRepository.findAll();
+            List<Category> listTemp = this.categoryRepository.findAll();
+            Iterator<Category> itr = listTemp.iterator();
+            while (itr.hasNext()) {
+                Category loan = itr.next();
+                if (loan.getActive() == null || loan.getActive() != 1) {
+                    itr.remove();
+                }
+            }
+            return listTemp;
         }catch (Exception ex){
             String error_ms = ex.getMessage();
+            System.out.println(error_ms);
             throw new RuntimeException(error_ms);
         }
     }
 
+    @Override
+    public List<Category> getAllCategoryForAdmin() throws RuntimeException{
+        try {
+            return this.categoryRepository.findAll();
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            System.out.println(error_ms);
+            throw new RuntimeException(error_ms);
+        }
+    }
     @Override
     public Category createCategory(Category category) throws RuntimeException{
         try {

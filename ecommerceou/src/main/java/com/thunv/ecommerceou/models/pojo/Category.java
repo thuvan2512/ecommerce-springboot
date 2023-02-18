@@ -27,6 +27,9 @@ public class Category {
     @Column(name = "avatar")
     @Getter @Setter
     private String avatar;
+    @Column(name = "active")
+    @Getter @Setter
+    private Integer active;
     @JsonIgnore
     @OneToMany(mappedBy = "category",fetch = FetchType.EAGER)
 //    @JsonIgnoreProperties({"field"})
@@ -35,11 +38,13 @@ public class Category {
     private Set<SalePost> salePostSet;
 
     public Category() {
+        this.active = 1;
     }
 
     public Category(Integer id, String name, String avatar) {
         this.id = id;
         this.name = name;
         this.avatar = avatar;
+        this.active = 1;
     }
 }
