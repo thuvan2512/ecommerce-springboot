@@ -326,6 +326,7 @@ public class SalePostController {
             if (salePostUpdateDTO.getSellStatusID() != null){
                 salePost.setSellStatus(this.sellStatusService.getSellStatusByID(salePostUpdateDTO.getSellStatusID()));
             }
+            salePost = salePostUpdateDTO.loadSalePostFromDTO(salePost);
             res = this.salePostService.updateSalePost(salePost);
         }catch (Exception ex){
             ms = ex.getMessage();
