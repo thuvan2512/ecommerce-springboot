@@ -2,6 +2,7 @@ package com.thunv.ecommerceou.utils;
 
 import com.thunv.ecommerceou.models.pojo.CartItem;
 import com.thunv.ecommerceou.services.CartService;
+import org.apache.commons.codec.digest.HmacUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -120,5 +121,15 @@ public class Utils {
                 + "                            </td>\n"
                 + "                        </tr>";
         return content;
+    }
+
+    public String hmacWithApacheCommons(String algorithm, String data, String key) {
+        String hmac = new HmacUtils(algorithm, key).hmacHex(data);
+        return hmac;
+    }
+
+    public String generateUUID(){
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString();
     }
 }
