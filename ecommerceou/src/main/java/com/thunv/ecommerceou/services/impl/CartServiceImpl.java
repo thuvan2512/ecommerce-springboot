@@ -3,16 +3,15 @@ package com.thunv.ecommerceou.services.impl;
 import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.repositories.*;
 import com.thunv.ecommerceou.services.*;
+import com.thunv.ecommerceou.utils.MomoPaymentUtils;
 import com.thunv.ecommerceou.utils.Utils;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +36,8 @@ public class CartServiceImpl implements CartService {
     private Utils utils;
     @Autowired
     private MailService mailService;
+    @Autowired
+    private MomoPaymentUtils momoPaymentUtils;
     @Override
     public List<CartItem> addToCart(User user, ItemPost itemPost, int quantity) throws RuntimeException{
         try {
@@ -176,7 +177,11 @@ public class CartServiceImpl implements CartService {
                 orders.setPaymentType(paymentType);
                 orders.setCreatedDate(new Date());
                 orders.setTotalPrice(this.getTotalPriceInCart(cart));
-                orders.setPaymentState(0);
+                if (paymentType.getId() == 2){
+                    orders.setPaymentState(1);
+                } else if (paymentType.getId() == 1) {
+                    orders.setPaymentState(0);
+                }
                 orders.setAuthor(user);
                 this.ordersRepository.save(orders);
                 Map<Integer, List<CartItem>> groupItemByAgency =
@@ -212,6 +217,51 @@ public class CartServiceImpl implements CartService {
                 throw new RuntimeException("Cart is empty");
             }
             return this.cartItemRepository.findByCart(cart).stream().toList();
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
+    public Map<String, String> getMomoPaymentInfo(User user) throws RuntimeException{
+        Map<String, String> result = new HashMap<>();
+        try {
+            Map<String, String> res = null;
+            Cart cart;
+            String orderInfo = "Pay bill on e-commerce OU";
+            if (this.cartRepository.existsByAuthor(user)){
+                cart = this.cartRepository.findByAuthor(user).get(0);
+            }else {
+                cart = new Cart();
+                cart.setAuthor(user);
+                this.cartRepository.save(cart);
+            }
+            List<CartItem> cartItemList = this.cartItemRepository.findByCart(cart).stream().toList();
+            for (CartItem cartItem: cartItemList){
+                if (cartItem.getItemPost().getInventory() < cartItem.getQuantity()){
+                    throw new RuntimeException(String.format("Item %s not enough quantity in stock",cartItem.getItemPost().getName()));
+                }
+            }
+            if (cartItemList.size() > 0){
+                String id = this.utils.generateUUID();
+                int amount = (int)((double) getTotalPriceInCart(cart));
+                String amountStr = String.valueOf(amount);
+                System.out.println(amountStr);
+                res = this.momoPaymentUtils.getPaymentInfo(id, amountStr, orderInfo, id);
+                System.out.println(res);
+                if (String.valueOf(res.get("resultCode")).equals("0")){
+                    result.put("payUrl", res.get("payUrl"));
+                    result.put("message", "Create payment info successfully!!!");
+                }
+                else {
+                    result.put("payUrl", null);
+                    result.put("message", "Create payment info failed !!!");
+                }
+            }else {
+                throw new RuntimeException("Cart is empty");
+            }
+            return result;
         }catch (Exception ex){
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);

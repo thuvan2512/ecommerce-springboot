@@ -133,6 +133,32 @@ public class CartController {
                 new ModelResponse(code,ms,res)
         );
     }
+
+
+    @PostMapping(path = "/get-momo-payment-info")
+    public ResponseEntity<ModelResponse> getMomoPaymentInfo(HttpServletRequest request){
+        String ms = "Get payment info successfully";
+        String code = "200";
+        Map<String, String> res = null;
+        try {
+            if (request.getHeader("Authorization") == null){
+                throw new RuntimeException("Authorization info not found");
+            }
+            String token = request.getHeader("Authorization").split("\s")[1];
+            List<User> list = this.userService.getUserByUsername(jwtTokenUtils.getUsernameFromToken(token));
+            if (list.size() == 0){
+                throw new RuntimeException("Can not find current user");
+            }
+            User user = list.get(0);
+            res = this.cartService.getMomoPaymentInfo(user);
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
     @PatchMapping(path = "/update-cart")
     public ResponseEntity<ModelResponse> updateCart(@RequestBody @Valid CartDTO cartDTO,
                                                    HttpServletRequest request,
@@ -166,6 +192,7 @@ public class CartController {
                 new ModelResponse(code,ms,res)
         );
     }
+
     @DeleteMapping(path = "/remove-item/{itemID}")
     public ResponseEntity<ModelResponse> removeItemInCart(@PathVariable(value = "itemID") String itemID,
                                                     HttpServletRequest request){
