@@ -25,6 +25,7 @@ public class OrderController {
     private OrderStateService orderStateService;
     @Autowired
     private UserService userService;
+
     @GetMapping(value = "/orders-agency/agency/{agencyID}")
     public ResponseEntity<ModelResponse> getOrderAgencyOfAgency(@PathVariable(value = "agencyID") String agencyID){
         String ms = "Get orders agency successfully";
@@ -43,6 +44,30 @@ public class OrderController {
                 new ModelResponse(code,ms,list)
         );
     }
+
+    @GetMapping(value = "/order-detail/get-orders-detail-by-order-agency/{orderAgencyID}")
+    public ResponseEntity<ModelResponse> getOrderDetailByOrderAgency(@PathVariable(value = "orderAgencyID") String orderAgencyID){
+        String ms;
+        String code;
+        List<OrderDetail> res = null;
+        HttpStatus status;
+        try {
+            OrderAgency orderAgency = this.orderService.getOrderAgencyByID(Integer.parseInt(orderAgencyID));
+            res = this.orderService.getListOrderDetailByOrderAgency(orderAgency);
+            ms = "Get order detail successfully";
+            code = "200";
+            status = HttpStatus.OK;
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
+
+
     @GetMapping(value = "/orders-agency/user/{userID}")
     public ResponseEntity<ModelResponse> getOrderAgencyOfUser(@PathVariable(value = "userID") String userID){
         String ms = "Get orders agency successfully";

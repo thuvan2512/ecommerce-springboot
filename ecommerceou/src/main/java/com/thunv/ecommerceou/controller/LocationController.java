@@ -53,6 +53,35 @@ public class LocationController {
         );
     }
 
+    @GetMapping(value = "/get-nearest-location")
+    public ResponseEntity<ModelResponse> getNearestLocation(@RequestParam(defaultValue = "0") String latitude,
+                                                            @RequestParam(defaultValue = "0") String longitude){
+        String ms;
+        String code;
+        String res = null;
+        HttpStatus status;
+        try {
+            Double lat = Double.parseDouble(latitude);
+            Double lng = Double.parseDouble(longitude);
+            List<Object[]> wardNearest = this.locationWardsService.getNearestLocationWard(lat, lng);
+            if (wardNearest != null && wardNearest.size() > 0){
+                res = this.locationService.getFullAddressByWardID(wardNearest.get(0)[0].toString());
+                status = HttpStatus.OK;
+                ms = "Get nearest locaton successfully";
+                code = "200";
+            }else {
+                throw new RuntimeException("Not found nearest location");
+            }
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
+
     @GetMapping(value = "/provinces/{provinceID}")
     public ResponseEntity<ModelResponse> getProvinceByID(@PathVariable(value = "provinceID") String provinceID){
         String ms;

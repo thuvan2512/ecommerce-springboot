@@ -9,4 +9,5 @@ public interface LocationWardsService {
     List<LocationWards> getAllLocationWards();
     List<LocationWards> getListLocationWardsByProvinceID(String provinceID);
     List<LocationWards> getListLocationWardsByDistrictID(String districtID);
+    List<Object[]> getNearestLocationWard(Double latitude, Double longitude);
 }

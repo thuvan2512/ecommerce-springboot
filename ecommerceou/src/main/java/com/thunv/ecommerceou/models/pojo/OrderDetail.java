@@ -1,5 +1,7 @@
 package com.thunv.ecommerceou.models.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,11 +26,13 @@ public class OrderDetail {
     @JoinColumn(name = "item_post",referencedColumnName = "id")
     @Getter
     @Setter
+    @JsonIgnoreProperties({"salePost"})
     private ItemPost itemPost;
     @ManyToOne
     @JoinColumn(name = "order_agency",referencedColumnName = "id")
     @Getter
     @Setter
+    @JsonIgnore
     private OrderAgency orderAgency;
 
     public OrderDetail() {

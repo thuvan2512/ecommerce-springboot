@@ -47,4 +47,14 @@ public class LocationWardsServiceImpl implements LocationWardsService {
             throw new RuntimeException(error_ms);
         }
     }
+
+    @Override
+    public List<Object[]> getNearestLocationWard(Double latitude, Double longitude) throws RuntimeException{
+        try {
+            return this.locationWardsRepository.getNearestLocationWard(latitude, longitude);
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
 }
