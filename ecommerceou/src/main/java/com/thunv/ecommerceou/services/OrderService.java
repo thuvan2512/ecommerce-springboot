@@ -9,5 +9,6 @@ public interface OrderService {
     List<OrderAgency> getListOrderAgencyByAgency(Agency agency);
     List<OrderAgency> getListOrderAgencyByUser(User user);
     List<Orders> getListOrderByUser(User user);
+    List<OrderDetail> getListOrderDetailByOrderAgency(OrderAgency orderAgency);
     OrderAgency updateStateOfOrdersAgency(OrderAgency orderAgency,OrderState orderState);
 }

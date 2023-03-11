@@ -1,6 +1,7 @@
 package com.thunv.ecommerceou.services.impl;
 
 import com.thunv.ecommerceou.models.pojo.*;
+import com.thunv.ecommerceou.repositories.OrderDetailRepository;
 import com.thunv.ecommerceou.repositories.OrdersAgencyRepository;
 import com.thunv.ecommerceou.repositories.OrdersRepository;
 import com.thunv.ecommerceou.services.OrderService;
@@ -15,6 +16,8 @@ public class OrderServiceImpl implements OrderService {
     private OrdersAgencyRepository ordersAgencyRepository;
     @Autowired
     private OrdersRepository ordersRepository;
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
 
     @Override
     public OrderAgency getOrderAgencyByID(int orderAgencyID)  throws RuntimeException{
@@ -46,6 +49,16 @@ public class OrderServiceImpl implements OrderService {
     public List<Orders> getListOrderByUser(User user) throws RuntimeException{
         try {
             return this.ordersRepository.findByAuthor(user);
+        } catch (Exception ex) {
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
+    public List<OrderDetail> getListOrderDetailByOrderAgency(OrderAgency orderAgency) throws RuntimeException{
+        try {
+            return this.orderDetailRepository.findByOrderAgency(orderAgency);
         } catch (Exception ex) {
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);
