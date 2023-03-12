@@ -192,7 +192,9 @@ public class CartServiceImpl implements CartService {
                     orderAgency.setOrders(orders);
                     orderAgency.setOrderState(this.orderStateService.getOrderStateByID(1));
                     this.ordersAgencyRepository.save(orderAgency);
+                    Double totalPrice = 0.0;
                     for (CartItem cartItem: v.getValue()){
+                        totalPrice += cartItem.getQuantity() * cartItem.getItemPost().getUnitPrice();
                         OrderDetail orderDetail = new OrderDetail();
                         orderDetail.setQuantity(cartItem.getQuantity());
                         orderDetail.setItemPost(cartItem.getItemPost());
@@ -202,6 +204,8 @@ public class CartServiceImpl implements CartService {
                         cartItem.getItemPost().setInventory(newQty);
                         this.itemRepository.save(cartItem.getItemPost());
                     }
+                    orderAgency.setTotalPrice(totalPrice);
+                    this.ordersAgencyRepository.save(orderAgency);
                 }
                 String mailTo = user.getEmail();
                 String subject = "Thank you for shopping at OU ecommerce";
