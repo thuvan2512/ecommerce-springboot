@@ -33,6 +33,10 @@ public class OrderAgency {
     @JoinColumn(name = "order_state",referencedColumnName = "id")
     @Getter @Setter
     private OrderState orderState;
+    @Column(name = "total_price")
+    @Getter
+    @Setter
+    private Double totalPrice;
     public OrderAgency() {
     }
 }
