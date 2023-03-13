@@ -4,10 +4,7 @@ import com.thunv.ecommerceou.dto.CartDTO;
 import com.thunv.ecommerceou.jwt.JwtTokenUtils;
 import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.res.ModelResponse;
-import com.thunv.ecommerceou.services.CartService;
-import com.thunv.ecommerceou.services.ItemService;
-import com.thunv.ecommerceou.services.PaymentTypeService;
-import com.thunv.ecommerceou.services.UserService;
+import com.thunv.ecommerceou.services.*;
 import com.thunv.ecommerceou.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +29,8 @@ public class CartController {
     private ItemService itemService;
     @Autowired
     private JwtTokenUtils jwtTokenUtils;
+    @Autowired
+    private CustomerAddressBookService customerAddressBookService;
     @Autowired
     private Utils utils;
     @Autowired
@@ -107,8 +106,9 @@ public class CartController {
                 new ModelResponse(code,ms,res)
         );
     }
-    @PostMapping(path = "/payment-cart/{paymentTypeID}")
+    @PostMapping(path = "/payment-cart/{paymentTypeID}/{addressID}")
     public ResponseEntity<ModelResponse> paymentCart(@PathVariable(value = "paymentTypeID") String paymentTypeID,
+                                                     @PathVariable(value = "addressID") String addressID,
                                                    HttpServletRequest request){
         String ms = "Payment cart successfully";
         String code = "200";
@@ -124,7 +124,11 @@ public class CartController {
             }
             PaymentType paymentType = this.paymentTypeService.getPaymentTypeByID(Integer.parseInt(paymentTypeID));
             User user = list.get(0);
-            res = this.cartService.paymentCart(user,paymentType);
+            CustomerAddressBook customerAddressBook = this.customerAddressBookService.getAddressByID(Integer.parseInt(addressID));
+            if (customerAddressBook.getCustomer().getId() != user.getId()){
+                throw new RuntimeException("Invalid address !!!");
+            }
+            res = this.cartService.paymentCart(user,paymentType, customerAddressBook);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
