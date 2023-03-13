@@ -37,6 +37,12 @@ public class OrderAgency {
     @Getter
     @Setter
     private Double totalPrice;
+
+    @ManyToOne
+    @JoinColumn(name = "delivery_info",referencedColumnName = "id")
+    @Getter
+    @Setter
+    private CustomerAddressBook deliveryInfo;
     public OrderAgency() {
     }
 }

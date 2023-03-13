@@ -1,22 +1,22 @@
 package com.thunv.ecommerceou.controller;
 
 
-import com.thunv.ecommerceou.models.pojo.Category;
-import com.thunv.ecommerceou.models.pojo.LocationDistricts;
-import com.thunv.ecommerceou.models.pojo.LocationProvinces;
-import com.thunv.ecommerceou.models.pojo.LocationWards;
+import com.thunv.ecommerceou.dto.AddressBookCreateDTO;
+import com.thunv.ecommerceou.dto.AgencyRegisterDTO;
+import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.res.ModelResponse;
-import com.thunv.ecommerceou.services.LocationDistrictsService;
-import com.thunv.ecommerceou.services.LocationProvincesService;
-import com.thunv.ecommerceou.services.LocationService;
-import com.thunv.ecommerceou.services.LocationWardsService;
+import com.thunv.ecommerceou.services.*;
 import com.thunv.ecommerceou.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -30,6 +30,10 @@ public class LocationController {
     private LocationWardsService locationWardsService;
     @Autowired
     private LocationService locationService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private CustomerAddressBookService customerAddressBookService;
     @Autowired
     private Utils utils;
     @GetMapping(value = "/get-full-address/{wardID}")
@@ -267,4 +271,71 @@ public class LocationController {
         );
     }
 
+    @GetMapping(value = "address-book/get-address-book-by-user-id/{userID}")
+    public ResponseEntity<ModelResponse> getAddressBookByCustomerID(@PathVariable(value = "userID") String userID){
+        String ms;
+        String code;
+        List<CustomerAddressBook> res = null;
+        HttpStatus status;
+        try {
+            res = this.customerAddressBookService.getCustomerAddressBookByUserID(Integer.parseInt(userID));
+            code = "200";
+            status = HttpStatus.OK;
+            ms = "Get address book successfully !!!";
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
+    @PostMapping(path = "address-book/create")
+    public ResponseEntity<ModelResponse> createCustomerAddressBook(@RequestBody @Valid AddressBookCreateDTO addressBookCreateDTO,
+                                                        BindingResult result){
+        if (result.hasErrors()) {
+            Map<String, String> errors = this.utils.getAllErrorValidation(result);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ModelResponse("400", "Invalid information", errors)
+            );
+        }
+        String ms;
+        String code;
+        CustomerAddressBook res = null;
+        try {
+            User user = userService.getUserByID(addressBookCreateDTO.getCustomerID());
+            CustomerAddressBook obj = new CustomerAddressBook();
+            obj = addressBookCreateDTO.loadCustomerAddressDTO(obj);
+            obj.setCreatedDate(new Date());
+            obj.setUpdatedDate(new Date());
+            obj.setCustomer(user);
+            this.customerAddressBookService.createOrUpdateAddress(obj);
+            res = obj;
+            ms = "Create new address into address book successfully";
+            code = "201";
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
+    @DeleteMapping(path = "address-book/delete-by-id/{addressID}")
+    public ResponseEntity<ModelResponse> deleteAddressByID(@PathVariable(value = "addressID") String addressID){
+        String ms = "Delete address successfully";
+        String code = "204";
+        HttpStatus status = HttpStatus.OK;
+        try {
+            this.customerAddressBookService.deleteCustomerAddressBook(Integer.parseInt(addressID));
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,null)
+        );
+    }
 }

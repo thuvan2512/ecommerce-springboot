@@ -109,6 +109,11 @@ public class User {
     @Getter @Setter
     private Set<Cart> cartSet;
 
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    @Getter @Setter
+    private Set<CustomerAddressBook> customerAddressBookSet;
+
 
     public User() {
     }

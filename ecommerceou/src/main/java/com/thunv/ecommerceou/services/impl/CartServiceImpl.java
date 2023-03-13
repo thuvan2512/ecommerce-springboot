@@ -156,7 +156,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartItem> paymentCart(User user, PaymentType paymentType) throws RuntimeException{
+    public List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook) throws RuntimeException{
         try {
             Cart cart;
             if (this.cartRepository.existsByAuthor(user)){
@@ -188,6 +188,7 @@ public class CartServiceImpl implements CartService {
                         cartItemList.stream().collect(Collectors.groupingBy(item -> item.getItemPost().getSalePost().getAgency().getId()));
                 for (Map.Entry<Integer,  List<CartItem>> v : groupItemByAgency.entrySet()) {
                     OrderAgency orderAgency = new OrderAgency();
+                    orderAgency.setDeliveryInfo(customerAddressBook);
                     orderAgency.setAgency(this.agencyService.getAgencyByID(v.getKey()));
                     orderAgency.setOrders(orders);
                     orderAgency.setOrderState(this.orderStateService.getOrderStateByID(1));

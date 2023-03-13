@@ -10,7 +10,7 @@ public interface CartService {
     List<CartItem> updateCart(User user,ItemPost itemPost,int quantity);
     List<CartItem> removeItemFromCart(User user,ItemPost itemPost);
     List<CartItem> clearCart(User user);
-    List<CartItem> paymentCart(User user, PaymentType paymentType);
+    List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook);
     Map<String, String> getMomoPaymentInfo(User user);
     Cart getCartByUser(User user);
     Double getTotalPriceInCart(Cart cart);
