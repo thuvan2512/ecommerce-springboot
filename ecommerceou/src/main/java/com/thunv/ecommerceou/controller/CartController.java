@@ -73,6 +73,29 @@ public class CartController {
                 new ModelResponse(code,ms,totalPrice)
         );
     }
+
+    @GetMapping(value = "/get-check-out-info-before-payment/{userID}")
+    public ResponseEntity<ModelResponse> getCheckOutInfoBeforePayment(@PathVariable(value = "userID") String userID){
+        String ms;
+        String code;
+        List<Object> mapResult = null;
+        HttpStatus status;
+        try {
+            User user = this.userService.getUserByID(Integer.parseInt(userID));
+            mapResult = this.cartService.getCheckOutPayment(user);
+            ms = "Get check out successfully !!!";
+            status = HttpStatus.OK;
+            code = "200";
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,mapResult)
+        );
+    }
+
     @PostMapping(path = "/add-to-cart")
     public ResponseEntity<ModelResponse> addToCart(@RequestBody @Valid CartDTO cartDTO,
                                                    HttpServletRequest request,

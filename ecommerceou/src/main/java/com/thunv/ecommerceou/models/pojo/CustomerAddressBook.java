@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
 
@@ -50,6 +51,34 @@ public class CustomerAddressBook {
     @Column(name = "description")
     @Getter @Setter
     private String description;
+
+    @Column(name = "to_province_name")
+    @Getter @Setter
+    private String toProvinceName;
+
+    @Column(name = "province_id")
+    @Getter @Setter
+    private Integer provinceID;
+
+    @Column(name = "to_district_name")
+    @Getter @Setter
+    private String toDistrictName;
+
+    @Column(name = "district_id")
+    @Getter @Setter
+    private Integer districtID;
+
+    @Column(name = "to_ward_name")
+    @Getter @Setter
+    private String toWardName;
+
+    @Column(name = "ward_id")
+    @Getter @Setter
+    private String wardID;
+
+    @Column(name = "to_address")
+    @Getter @Setter
+    private String toAddress;
 
     @OneToMany(mappedBy = "deliveryInfo",cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonIgnore

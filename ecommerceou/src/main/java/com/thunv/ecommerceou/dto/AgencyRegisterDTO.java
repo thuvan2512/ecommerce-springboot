@@ -26,12 +26,47 @@ public class AgencyRegisterDTO {
     @Getter @Setter
     @NotNull(message = "Field can not be null")
     private Integer fieldID;
+
+    @NotNull(message = "Can't be not null")
+    @Getter @Setter
+    private String fromProvinceName;
+
+    @NotNull(message = "Can't be not null")
+    @Getter @Setter
+    private Integer provinceID;
+
+    @NotNull(message = "Can't be not null")
+    @Getter @Setter
+    private String fromDistrictName;
+
+    @NotNull(message = "Can't be not null")
+    @Getter @Setter
+    private Integer districtID;
+
+    @NotNull(message = "Can't be not null")
+    @Getter @Setter
+    private String fromWardName;
+
+    @NotNull(message = "Can't be not null")
+    @Getter @Setter
+    private String wardID;
+
+    @NotNull(message = "Can't be not null")
+    @Getter @Setter
+    private String fromAddress;
     public Agency loadAgencyFromAgencyDTO(Agency agency) throws RuntimeException{
         agency.setName(this.getName());
         agency.setAvatar(this.getAvatar());
         agency.setCoverImage(this.getCoverImage());
         agency.setAddress(this.getAddress());
         agency.setHotline(this.getHotline());
+        agency.setFromProvinceName(this.getFromProvinceName());
+        agency.setProvinceID(this.getProvinceID());
+        agency.setFromDistrictName(this.getFromDistrictName());
+        agency.setDistrictID(this.getDistrictID());
+        agency.setFromWardName(this.getFromWardName());
+        agency.setWardID(this.getWardID());
+        agency.setFromAddress(this.getFromAddress());
         return agency;
     }
 

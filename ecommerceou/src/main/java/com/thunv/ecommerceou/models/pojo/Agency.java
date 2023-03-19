@@ -19,25 +19,61 @@ public class Agency {
     @Column(name = "id")
     @Getter @Setter
     private Integer id;
+
     @Basic(optional = false)
     @Column(name = "name")
     @Getter @Setter
     private String name;
+
     @Column(name = "active")
     @Getter @Setter
     private Integer isActive = 0;
+
     @Column(name = "avatar")
     @Getter @Setter
     private String avatar;
+
     @Column(name = "cover_image")
     @Getter @Setter
     private String coverImage;
+
     @Column(name = "address")
     @Getter @Setter
     private String address;
+
     @Column(name = "hotline")
     @Getter @Setter
     private String hotline;
+
+    @Column(name = "from_province_name")
+    @Getter @Setter
+    private String fromProvinceName;
+
+    @Column(name = "province_id")
+    @Getter @Setter
+    private Integer provinceID;
+
+    @Column(name = "from_district_name")
+    @Getter @Setter
+    private String fromDistrictName;
+
+    @Column(name = "district_id")
+    @Getter @Setter
+    private Integer districtID;
+
+    @Column(name = "from_ward_name")
+    @Getter @Setter
+    private String fromWardName;
+
+    @Column(name = "ward_id")
+    @Getter @Setter
+    private String wardID;
+
+    @Column(name = "from_address")
+    @Getter @Setter
+    private String fromAddress;
+
+
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     @Getter @Setter
