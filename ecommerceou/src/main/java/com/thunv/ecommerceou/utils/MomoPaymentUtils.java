@@ -56,7 +56,6 @@ public class MomoPaymentUtils {
                             String.format("    \"signature\": \"%s\"\n", signature) +
                             "}", ContentType.APPLICATION_JSON)
                     .execute().returnContent().asString();
-            System.out.println(response.getClass());
             ObjectMapper mapper = new ObjectMapper();
             mapResult = mapper.readValue(response, Map.class);
             return mapResult;

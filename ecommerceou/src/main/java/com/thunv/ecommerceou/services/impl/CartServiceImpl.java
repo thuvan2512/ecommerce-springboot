@@ -230,6 +230,44 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    public List<Object> getCheckOutPayment(User user) throws RuntimeException{
+        try {
+            List<Object> mapResult = new ArrayList<>();
+            Cart cart;
+            if (this.cartRepository.existsByAuthor(user)){
+                cart = this.cartRepository.findByAuthor(user).get(0);
+            }else {
+                throw new RuntimeException("Card not found");
+            }
+            List<CartItem> cartItemList = this.cartItemRepository.findByCart(cart).stream().toList();
+            for (CartItem cartItem: cartItemList){
+                if (cartItem.getItemPost().getInventory() < cartItem.getQuantity()){
+                    throw new RuntimeException(String.format("Item %s not enough quantity in stock",cartItem.getItemPost().getName()));
+                }
+            }
+            if (cartItemList.size() > 0){
+                Map<Integer, List<CartItem>> groupItemByAgency =
+                        cartItemList.stream().collect(Collectors.groupingBy(item -> item.getItemPost().getSalePost().getAgency().getId()));
+                for (Map.Entry<Integer,  List<CartItem>> v : groupItemByAgency.entrySet()) {
+                    Map<Object, Object> temp = new HashMap<>();
+                    temp.put("agencyID", v.getKey());
+                    temp.put("cartItems", v.getValue());
+                    Double totalPrice = 0.0;
+                    for (CartItem cartItem: v.getValue()){
+                        totalPrice += cartItem.getQuantity() * cartItem.getItemPost().getUnitPrice();
+                    }
+                    temp.put("calculatorPrice", totalPrice);
+                    mapResult.add(temp);
+                }
+            }
+            return mapResult;
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
     public Map<String, String> getMomoPaymentInfo(User user) throws RuntimeException{
         Map<String, String> result = new HashMap<>();
         try {

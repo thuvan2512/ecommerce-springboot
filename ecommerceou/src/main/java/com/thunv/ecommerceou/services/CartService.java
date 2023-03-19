@@ -11,6 +11,7 @@ public interface CartService {
     List<CartItem> removeItemFromCart(User user,ItemPost itemPost);
     List<CartItem> clearCart(User user);
     List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook);
+    List<Object> getCheckOutPayment(User user);
     Map<String, String> getMomoPaymentInfo(User user);
     Cart getCartByUser(User user);
     Double getTotalPriceInCart(Cart cart);
