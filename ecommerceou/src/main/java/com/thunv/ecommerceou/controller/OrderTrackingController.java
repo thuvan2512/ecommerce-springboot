@@ -125,10 +125,11 @@ public class OrderTrackingController {
             CustomerAddressBook customerAddressBook = this.customerAddressBookService.getAddressByID(Integer.parseInt(addressBookID));
             Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
             Integer fromDistrict = agency.getDistrictID();
+            String fromWard = agency.getWardID();
             Integer toDistrict = customerAddressBook.getDistrictID();
             String toWard = customerAddressBook.getWardID();
             if (fromDistrict != null && toDistrict != null && toWard != null){
-                Map<Object, Object> temp = this.orderTrackingService.getAvailableServiceShippingOfGHNExpress(fromDistrict, toDistrict, toWard);
+                Map<Object, Object> temp = this.orderTrackingService.getAvailableServiceShippingOfGHNExpress(fromDistrict,fromWard, toDistrict, toWard);
                 if(String.valueOf(temp.get("code")).equals("200")){
                     res.put("services", temp.get("data"));
                     code = "200";

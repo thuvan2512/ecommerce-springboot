@@ -46,9 +46,9 @@ public class OrderTrackingServiceImpl implements OrderTrackingService {
     }
 
     @Override
-    public Map<Object, Object> getAvailableServiceShippingOfGHNExpress(int fromDistrictID, int toDistrictID, String toWardID) throws RuntimeException{
+    public Map<Object, Object> getAvailableServiceShippingOfGHNExpress(int fromDistrictID, String fromWard, int toDistrictID, String toWardID) throws RuntimeException{
         try {
-            Map<Object, Object> results = this.ghnExpressUtils.getAvailableServiceShippingOfGHNExpress(fromDistrictID, toDistrictID, toWardID);
+            Map<Object, Object> results = this.ghnExpressUtils.getAvailableServiceShippingOfGHNExpress(fromDistrictID, fromWard, toDistrictID, toWardID);
             return results;
         }catch (Exception exception){
             System.out.println(exception.getMessage());
