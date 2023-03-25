@@ -30,6 +30,10 @@ public class CustomerAddressBook {
     @Getter @Setter
     private String fullAddress;
 
+    @Column(name = "customer_name")
+    @Getter @Setter
+    private String customerName;
+
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     @Getter @Setter
@@ -88,7 +92,7 @@ public class CustomerAddressBook {
     @Override
     public String toString() {
         return "CustomerAddressBook{" +
-                "customer=" + customer.getUsername() +
+                "customer=" + customerName +
                 ", deliveryPhone='" + deliveryPhone + '\'' +
                 ", description='" + description + '\'' +
                 ", toProvinceName='" + toProvinceName + '\'' +
