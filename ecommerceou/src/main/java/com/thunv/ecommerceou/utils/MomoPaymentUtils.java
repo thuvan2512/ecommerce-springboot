@@ -35,9 +35,9 @@ public class MomoPaymentUtils {
         String secretKey = env.getProperty("momo.secretKey");
         String rawCode = String.format("accessKey=%s&amount=%s&extraData=%s&ipnUrl=%s&orderId=%s&orderInfo=%s&partnerCode=%s&redirectUrl=%s&requestId=%s&requestType=%s",
                 accessKey, amount, "", ipnUrl, orderId, orderInfo, partnerCode, redirectUrl, requestId, requestType);
-        String signature = this.utils.hmacWithApacheCommons("HmacSHA256", rawCode, secretKey);
         Map<String, String> mapResult = new HashMap<>();
         try {
+            String signature = this.utils.hmacWithApacheCommons("HmacSHA256", rawCode, secretKey);
             String response = Request.Post(MOMO_LINK_GET_PAYMENT_INFO)
                     .addHeader("Content-Type", "application/json")
                     .bodyString("{\n" +

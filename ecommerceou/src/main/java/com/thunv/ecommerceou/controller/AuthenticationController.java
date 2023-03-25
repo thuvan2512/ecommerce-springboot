@@ -48,19 +48,24 @@ public class AuthenticationController {
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public ResponseEntity<ModelResponse> createAuthenticationToken(@RequestBody JwtDTO authenticationRequest) throws Exception {
+        try {
+            authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+            final UserDetails userDetails = userService
+                    .loadUserByUsername(authenticationRequest.getUsername());
 
-        final UserDetails userDetails = userService
-                .loadUserByUsername(authenticationRequest.getUsername());
+            final String token = jwtTokenUtils.generateToken(userDetails);
+            final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
+            String ex = this.utils.getDateFormatter().format(expirationDate);
 
-        final String token = jwtTokenUtils.generateToken(userDetails);
-        final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
-        String ex = this.utils.getDateFormatter().format(expirationDate);
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
-        );
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
+            );
+        }catch (Exception exception){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    new ModelResponse("400","Get auth token failed", null)
+            );
+        }
     }
 //    @GetMapping("/login-google/get-code")
 //    public ResponseEntity<ModelResponse> loginGoogle(HttpServletRequest request) throws IOException {

@@ -84,4 +84,20 @@ public class CustomerAddressBook {
     @JsonIgnore
     @Getter @Setter
     private Set<OrderAgency> orderAgencySet;
+
+    @Override
+    public String toString() {
+        return "CustomerAddressBook{" +
+                "customer=" + customer.getUsername() +
+                ", deliveryPhone='" + deliveryPhone + '\'' +
+                ", description='" + description + '\'' +
+                ", toProvinceName='" + toProvinceName + '\'' +
+                ", provinceID=" + provinceID +
+                ", toDistrictName='" + toDistrictName + '\'' +
+                ", districtID=" + districtID +
+                ", toWardName='" + toWardName + '\'' +
+                ", wardID='" + wardID + '\'' +
+                ", toAddress='" + toAddress + '\'' +
+                "}\n";
+    }
 }

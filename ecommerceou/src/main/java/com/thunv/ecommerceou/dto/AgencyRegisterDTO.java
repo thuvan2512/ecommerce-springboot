@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 public class AgencyRegisterDTO {
     @Getter @Setter
@@ -19,6 +20,8 @@ public class AgencyRegisterDTO {
     @NotNull(message = "address can not be null")
     private String address;
     @Getter @Setter
+    @NotNull(message = "Hotline can not be null")
+//    @Pattern(regexp="^\\d{10}$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     private String hotline;
     @Getter @Setter
     @NotNull(message = "Manager can not be null")

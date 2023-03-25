@@ -113,5 +113,19 @@ public class Agency {
 
     }
 
-
+    @Override
+    public String toString() {
+        return "Agency {" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", hotline='" + hotline + '\'' +
+                ", fromProvinceName='" + fromProvinceName + '\'' +
+                ", provinceID=" + provinceID +
+                ", fromDistrictName='" + fromDistrictName + '\'' +
+                ", districtID=" + districtID +
+                ", fromWardName='" + fromWardName + '\'' +
+                ", wardID='" + wardID + '\'' +
+                ", fromAddress='" + fromAddress + '\'' +
+                "}\n";
+    }
 }
