@@ -50,6 +50,17 @@ public class OrderTrackingServiceImpl implements OrderTrackingService {
     }
 
     @Override
+    public Map<Object, Object> generateTokenToPrintOrderOfGHNExpress(String orderCode) throws RuntimeException{
+        try {
+            Map<Object, Object> results = this.ghnExpressUtils.generateTokenToPrintOrderOfGHNExpress(orderCode);
+            return results;
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
+        return new HashMap<>();
+    }
+
+    @Override
     public Map<Object, Object> getAvailableServiceShippingOfGHNExpress(int fromDistrictID, String fromWard, int toDistrictID, String toWardID) throws RuntimeException{
         try {
             Map<Object, Object> results = this.ghnExpressUtils.getAvailableServiceShippingOfGHNExpress(fromDistrictID, fromWard, toDistrictID, toWardID);

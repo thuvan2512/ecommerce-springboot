@@ -36,6 +36,7 @@ public class GHNExpressUtils {
     private static final String GHN_EXPRESS_LINK_CALCULATE_THE_SHIP_FEE = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee";
     private static final String GHN_EXPRESS_LINK_CALCULATE_THE_EXPECTED_DELIVERY_TIME= "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/leadtime";
     private static final String GHN_EXPRESS_LINK_CREATE_ORDER = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create";
+    private static final String GHN_EXPRESS_LINK_GENERATE_TOKEN_PRINT_ORDER = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/a5/gen-token";
 
     public Map<Object, Object> getLocationProvinceOfGHNExpress() throws ClientProtocolException, IOException {
         String token = env.getProperty("ghn.token.production");
@@ -336,6 +337,31 @@ public class GHNExpressUtils {
                     .execute().returnResponse();
             String temp = new String(EntityUtils.toByteArray(response.getEntity()));
             System.out.println(temp);
+            ObjectMapper mapper = new ObjectMapper();
+            mapResult = mapper.readValue(temp, Map.class);
+            return mapResult;
+        }catch (Exception exception){
+            System.out.printf("%s", exception.toString());
+        }
+        mapResult.put("message_err", "Có lỗi trong quá khi call api của GHN !!!");
+        return mapResult;
+    }
+
+    public Map<Object, Object> generateTokenToPrintOrderOfGHNExpress(String orderCode) throws ClientProtocolException, IOException {
+        String token = env.getProperty("ghn.token.sandbox");
+        Map<Object, Object> mapResult = new HashMap<>();
+        String orderCodeInput = String.format("[\"%s\"]", orderCode);
+        try {
+
+            HttpResponse response = Request.Post(GHN_EXPRESS_LINK_GENERATE_TOKEN_PRINT_ORDER)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Token", token)
+                    .bodyString("{\n" +
+                            String.format("    \"order_codes\": %s", orderCodeInput) +
+                            "\n}", ContentType.APPLICATION_JSON)
+                    .execute().returnResponse();
+            String temp = new String(EntityUtils.toByteArray(response.getEntity()));
+//            System.out.println(temp);
             ObjectMapper mapper = new ObjectMapper();
             mapResult = mapper.readValue(temp, Map.class);
             return mapResult;
