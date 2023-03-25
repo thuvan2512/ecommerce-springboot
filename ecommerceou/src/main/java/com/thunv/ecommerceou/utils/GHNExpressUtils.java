@@ -2,7 +2,9 @@ package com.thunv.ecommerceou.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thunv.ecommerceou.models.pojo.Agency;
+import com.thunv.ecommerceou.models.pojo.CartItem;
 import com.thunv.ecommerceou.models.pojo.CustomerAddressBook;
+import io.swagger.models.auth.In;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -257,68 +259,90 @@ public class GHNExpressUtils {
         return mapResult;
     }
 
-//    public Map<Object, Object> createOrderShipping(Agency agency, CustomerAddressBook customerAddressBook) throws ClientProtocolException, IOException {
-//        String token = env.getProperty("ghn.token.sandbox");
-//        String shopID = env.getProperty("ghn.shopManager.shopID");
-//        String requireNote = env.getProperty("ghn.shopManager.required_note");
-//
-//        Map<Object, Object> mapResult = new HashMap<>();
-//        try {
-//
-//            HttpResponse response = Request.Post(GHN_EXPRESS_LINK_CALCULATOR_SHIP_FEE)
-//                    .addHeader("Content-Type", "application/json")
-//                    .addHeader("ShopId", shopID)
-//                    .addHeader("Token", token)
-//                    .bodyString("{\n" +
-//                            String.format("    \"payment_type_id\": %d, \n", 2) +
-//                            String.format("    \"note\": %s, \n", "Please call before delivery") +
-//                            String.format("    \"from_name\": %s, \n", agency.getName()) +
-//                            String.format("    \"from_phone\": %s, \n", agency.getHotline()) +
-//                            String.format("    \"from_address\": %s, \n", agency.getFromAddress()) +
-//                            String.format("    \"from_ward_name\": %s, \n", agency.getFromWardName()) +
-//                            String.format("    \"from_district_name\": %s, \n", agency.getFromDistrictName()) +
-//                            String.format("    \"from_province_name\": %s, \n", agency.getFromProvinceName()) +
-//                            String.format("    \"required_note\": %s, \n", requireNote) +
-//                            String.format("    \"return_name\": %s, \n", agency.getName()) +
-//                            String.format("    \"return_phone\": %s, \n", agency.getHotline()) +
-//                            String.format("    \"return_address\": %s, \n", agency.getFromAddress()) +
-//                            String.format("    \"return_ward_name\": %s, \n", agency.getFromWardName()) +
-//                            String.format("    \"return_district_name\": %s, \n", agency.getFromDistrictName()) +
-//                            String.format("    \"return_province_name\": %s, \n", agency.getFromProvinceName()) +
-//                            String.format("    \"client_order_code\": %s, \n", "") +
-//                            String.format("    \"to_name\": %s, \n", customerAddressBook.getCustomer().getUsername()) +
-//                            String.format("    \"to_phone\": %s, \n", customerAddressBook.getDeliveryPhone()) +
-//                            String.format("    \"to_address\": %s, \n", customerAddressBook.getToAddress()) +
-//                            String.format("    \"to_ward_name\": %s, \n", customerAddressBook.getToWardName()) +
-//                            String.format("    \"to_district_name\": %s, \n", customerAddressBook.getToDistrictName()) +
-//                            String.format("    \"to_province_name\": %s, \n", customerAddressBook.getToProvinceName()) +
-//                            String.format("    \"cod_amount\": %d, \n", fromD) +
-//                            String.format("    \"content\": %s, \n", "Thank you for shopping at OU Ecom.") +
-//                            String.format("    \"weight\": %d, \n", 1) +
-//                            String.format("    \"length\": %d, \n", 0) +
-//                            String.format("    \"width\": %d, \n", 0) +
-//                            String.format("    \"height\": %d, \n", 0) +
-//                            String.format("    \"cod_failed_amount\": %d, \n", 0) +
+    public Map<Object, Object> createOrderShipping(Integer paymentTypeOfGHN, Agency agency, CustomerAddressBook customerAddressBook, List<CartItem> listItem, Integer serviceID, Integer serviceTypeID, Integer amountCOD) throws ClientProtocolException, IOException {
+        String token = env.getProperty("ghn.token.sandbox");
+        String shopID = env.getProperty("ghn.shopManager.shopID");
+        String requireNote = env.getProperty("ghn.shopManager.required_note");
+        String strItems = "[";
+        int count = 0;
+        for(CartItem item: listItem){
+            count += 1;
+            if (count != 1){
+                strItems += ",";
+            }
+            String strItem = "        {\n" +
+                    String.format("            \"name\":\"%s\",\n", item.getItemPost().getName()) +
+                    String.format("                \"code\":\"%s\",\n", item.getItemPost().getId()) +
+                    String.format("                \"quantity\": %d,\n", item.getQuantity()) +
+                    String.format("                \"price\": %.0f,\n", item.getItemPost().getUnitPrice()) +
+                    "                \"length\": 0,\n" +
+                    "                \"width\": 0,\n" +
+                    "                \"height\": 0,\n" +
+                    "                \"category\":\n" +
+                    "            {\n" +
+                    String.format("                \"level1\":\"%s\"", item.getItemPost().getSalePost().getCategory().getName()) +
+                    "            \n}" +
+                    "        \n}";
+            strItems += strItem;
+        }
+        strItems += "]";
+        Map<Object, Object> mapResult = new HashMap<>();
+        try {
+
+            HttpResponse response = Request.Post(GHN_EXPRESS_LINK_CREATE_ORDER)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("ShopId", shopID)
+                    .addHeader("Token", token)
+                    .bodyString("{\n" +
+                            String.format("    \"payment_type_id\": %d, \n", paymentTypeOfGHN) +
+                            String.format("    \"note\": \"%s\", \n", "Please call before delivery") +
+                            String.format("    \"from_name\": \"%s\", \n", agency.getName()) +
+                            String.format("    \"from_phone\": \"%s\", \n", agency.getHotline()) +
+                            String.format("    \"from_address\": \"%s\", \n", agency.getFromAddress()) +
+                            String.format("    \"from_ward_name\": \"%s\", \n", agency.getFromWardName()) +
+                            String.format("    \"from_district_name\": \"%s\", \n", agency.getFromDistrictName()) +
+                            String.format("    \"from_province_name\": \"%s\", \n", agency.getFromProvinceName()) +
+                            String.format("    \"required_note\": \"%s\", \n", requireNote) +
+                            String.format("    \"return_name\": \"%s\", \n", agency.getName()) +
+                            String.format("    \"return_phone\": \"%s\", \n", agency.getHotline()) +
+                            String.format("    \"return_address\": \"%s\", \n", agency.getFromAddress()) +
+                            String.format("    \"return_ward_name\": \"%s\", \n", agency.getFromWardName()) +
+                            String.format("    \"return_district_name\": \"%s\", \n", agency.getFromDistrictName()) +
+                            String.format("    \"return_province_name\": \"%s\", \n", agency.getFromProvinceName()) +
+                            String.format("    \"client_order_code\": \"%s\", \n", "") +
+                            String.format("    \"to_name\": \"%s\", \n", customerAddressBook.getCustomer().getUsername()) +
+                            String.format("    \"to_phone\": \"%s\", \n", customerAddressBook.getDeliveryPhone()) +
+                            String.format("    \"to_address\": \"%s\", \n", customerAddressBook.getToAddress()) +
+                            String.format("    \"to_ward_name\": \"%s\", \n", customerAddressBook.getToWardName()) +
+                            String.format("    \"to_district_name\": \"%s\", \n", customerAddressBook.getToDistrictName()) +
+                            String.format("    \"to_province_name\": \"%s\", \n", customerAddressBook.getToProvinceName()) +
+                            String.format("    \"cod_amount\": %d, \n", amountCOD) +
+                            String.format("    \"content\": \"%s\", \n", "Thank you for shopping at OU Ecom.") +
+                            String.format("    \"weight\": %d, \n", 100) +
+                            String.format("    \"length\": %d, \n", 0) +
+                            String.format("    \"width\": %d, \n", 0) +
+                            String.format("    \"height\": %d, \n", 0) +
+                            String.format("    \"cod_failed_amount\": %d, \n", 0) +
 //                            String.format("    \"pick_station_id\": %d, \n", fromDistrictID) +
 //                            String.format("    \"deliver_station_id\": %d, \n", fromDistrictID) +
-//                            String.format("    \"insurance_value\": %d, \n", fromDistrictID) +
-//                            String.format("    \"service_id\": %d, \n", fromDistrictID) +
-//                            String.format("    \"service_type_id\": %d, \n", fromDistrictID) +
-//                            String.format("    \"coupon\": %d, \n", fromDistrictID) +
-//                            String.format("    \"pick_shift\": %d, \n", fromDistrictID) +
-//                            String.format("    \"pickup_time\": %d, \n", fromDistrictID) +
-//                            String.format("    \"items\": %s \n", fromDistrictID) +
-//                            "\n}", ContentType.APPLICATION_JSON)
-//                    .execute().returnResponse();
-//            String temp = new String(EntityUtils.toByteArray(response.getEntity()));
-//            System.out.println(temp);
-//            ObjectMapper mapper = new ObjectMapper();
-//            mapResult = mapper.readValue(temp, Map.class);
-//            return mapResult;
-//        }catch (Exception exception){
-//            System.out.printf("%s", exception.toString());
-//        }
-//        mapResult.put("message_err", "Có lỗi trong quá khi call api của GHN !!!");
-//        return mapResult;
-//    }
+                            String.format("    \"insurance_value\": %d, \n", 0) +
+                            String.format("    \"service_id\": %s, \n", String.valueOf(serviceID)) +
+                            String.format("    \"service_type_id\": %s, \n", String.valueOf(serviceTypeID)) +
+                            "    \"coupon\": null, \n" +
+                            "    \"pick_shift\": null, \n" +
+                            "    \"pickup_time\": null, \n" +
+                            String.format("    \"items\": %s \n", strItems) +
+                            "\n}", ContentType.APPLICATION_JSON)
+                    .execute().returnResponse();
+            String temp = new String(EntityUtils.toByteArray(response.getEntity()));
+            System.out.println(temp);
+            ObjectMapper mapper = new ObjectMapper();
+            mapResult = mapper.readValue(temp, Map.class);
+            return mapResult;
+        }catch (Exception exception){
+            System.out.printf("%s", exception.toString());
+        }
+        mapResult.put("message_err", "Có lỗi trong quá khi call api của GHN !!!");
+        return mapResult;
+    }
 }

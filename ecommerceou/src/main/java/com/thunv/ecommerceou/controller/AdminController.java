@@ -2,13 +2,12 @@ package com.thunv.ecommerceou.controller;
 
 import com.thunv.ecommerceou.dto.CartDTO;
 import com.thunv.ecommerceou.dto.CategoryDTO;
-import com.thunv.ecommerceou.models.pojo.CartItem;
-import com.thunv.ecommerceou.models.pojo.Category;
-import com.thunv.ecommerceou.models.pojo.ItemPost;
-import com.thunv.ecommerceou.models.pojo.User;
+import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.res.ModelResponse;
 import com.thunv.ecommerceou.services.CategoryService;
+import com.thunv.ecommerceou.services.ManageErrorLogService;
 import com.thunv.ecommerceou.utils.Utils;
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,59 @@ public class AdminController {
     private Utils utils;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private ManageErrorLogService manageErrorLogService;
 
+
+    @GetMapping(value = "/get-all-err-logs")
+    public ResponseEntity<ModelResponse> getAllManageErrorLogByType(@RequestParam(defaultValue = "") String logType) {
+        String ms;
+        String code;
+        List<ManageErrorLog> list = null;
+        HttpStatus status;
+        try {
+            list = this.manageErrorLogService.getAllManageErrorLogs(logType);
+            ms = "Get all logs successfully";
+            code = "200";
+            status = HttpStatus.OK;
+
+        } catch (Exception ex) {
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code, ms, list)
+        );
+    }
+    @PatchMapping(value = "/change-status-resolve-problem/{logID}")
+    public ResponseEntity<ModelResponse> changeStatusResolveErrorLog(@PathVariable(value = "logID") String logID) {
+        String ms;
+        String code;
+        List<ManageErrorLog> list = null;
+        HttpStatus status;
+        try {
+            ManageErrorLog manageErrorLog = this.manageErrorLogService.getLogByID(Integer.parseInt(logID));
+            Integer statusResolve = manageErrorLog.getIsResolve();
+            if (statusResolve == 1){
+                manageErrorLog.setIsResolve(0);
+            }else {
+                manageErrorLog.setIsResolve(1);
+            }
+            this.manageErrorLogService.saveThirdPartyErrorLog(manageErrorLog);
+            ms = "Change status resolve logs successfully";
+            code = "200";
+            status = HttpStatus.OK;
+
+        } catch (Exception ex) {
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code, ms, list)
+        );
+    }
     @GetMapping(value = "/get-all-categories")
     public ResponseEntity<ModelResponse> getAllCategoriesForAdmin() {
         String ms = "Get all categories successfully";

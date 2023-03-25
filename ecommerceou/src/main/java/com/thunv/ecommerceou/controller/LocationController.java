@@ -304,6 +304,9 @@ public class LocationController {
         String code;
         CustomerAddressBook res = null;
         try {
+            if (this.utils.checkPhoneNumberIsValid(addressBookCreateDTO.getDeliveryPhone()) == false){
+                throw new RuntimeException("Invalid phone number !!!");
+            }
             User user = userService.getUserByID(addressBookCreateDTO.getCustomerID());
             CustomerAddressBook obj = new CustomerAddressBook();
             obj = addressBookCreateDTO.loadCustomerAddressDTO(obj);

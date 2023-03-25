@@ -150,6 +150,9 @@ public class AgencyController {
         String code = "201";
         Agency res = null;
         try {
+            if (this.utils.checkPhoneNumberIsValid(agencyRegisterDTO.getHotline()) == false){
+                throw new RuntimeException("Invalid phone number !!!");
+            }
             res = this.agencyService.createAgency(agencyRegisterDTO);
             this.censorshipAgencyService.createCensorshipAgency(res);
         }catch (Exception ex){
@@ -187,6 +190,11 @@ public class AgencyController {
         Agency res = null;
         HttpStatus status = HttpStatus.OK;
         try {
+            if (agencyUpdateDTO.getHotline() != null){
+                if (this.utils.checkPhoneNumberIsValid(agencyUpdateDTO.getHotline()) == false){
+                    throw new RuntimeException("Invalid phone number !!!");
+                }
+            }
             Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
             agencyUpdateDTO.loadAgencyFromAgencyDTO(agency);
             res = this.agencyService.updateAgency(agency);

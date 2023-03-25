@@ -5,11 +5,8 @@ import com.thunv.ecommerceou.repositories.*;
 import com.thunv.ecommerceou.services.*;
 import com.thunv.ecommerceou.utils.MomoPaymentUtils;
 import com.thunv.ecommerceou.utils.Utils;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,6 +15,8 @@ import java.util.stream.Collectors;
 public class CartServiceImpl implements CartService {
     @Autowired
     private CartRepository cartRepository;
+    @Autowired
+    private ManageErrorLogService manageErrorLogService;
     @Autowired
     private CartItemRepository cartItemRepository;
     @Autowired
@@ -38,6 +37,8 @@ public class CartServiceImpl implements CartService {
     private MailService mailService;
     @Autowired
     private MomoPaymentUtils momoPaymentUtils;
+    @Autowired
+    private OrderTrackingService orderTrackingService;
     @Override
     public List<CartItem> addToCart(User user, ItemPost itemPost, int quantity) throws RuntimeException{
         try {
@@ -156,8 +157,11 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook) throws RuntimeException{
+    public List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook, Integer serviceID, Integer serviceTypeID) throws RuntimeException{
         try {
+            if (this.utils.checkPhoneNumberIsValid(customerAddressBook.getDeliveryPhone())== false){
+                throw new RuntimeException("Invalid phone !!!");
+            }
             Cart cart;
             if (this.cartRepository.existsByAuthor(user)){
                 cart = this.cartRepository.findByAuthor(user).get(0);
@@ -197,6 +201,36 @@ public class CartServiceImpl implements CartService {
                         totalPrice += cartItem.getQuantity() * cartItem.getItemPost().getUnitPrice();
                     }
                     orderAgency.setTotalPrice(totalPrice);
+                    try {
+                        Integer payShipType;
+                        Integer amountCOD;
+                        if (paymentType.getId() == 1){
+                            payShipType = 2;
+                            amountCOD = (int)(double) totalPrice;
+                        }else {
+                            payShipType = 1;
+                            amountCOD = 0;
+                        }
+                        Agency agencyShip = this.agencyService.getAgencyByID(v.getKey());
+                        Map<Object, Object> createOrder = this.orderTrackingService.createOrderOfGHNExpress(payShipType, agencyShip, customerAddressBook, v.getValue(), serviceID, serviceTypeID, amountCOD);
+                        if (String.valueOf(createOrder.get("code")).equals("200")){
+                            Map<Object, Object> createOrderTemp= (Map<Object,Object>) createOrder.get("data");
+                            System.out.println(createOrderTemp.toString());
+                            orderAgency.setOrderExpressID(createOrderTemp.get("order_code").toString());
+                            orderAgency.setShipFee(Double.parseDouble(createOrderTemp.get("total_fee").toString()));
+                            orderAgency.setExpectedDeliveryTime(createOrderTemp.get("expected_delivery_time").toString());
+                            System.out.println(orderAgency.getOrderExpressID());
+                        }else {
+                            this.utils.saveLogError("ERROR_CREATE_ORDER_OF_GHN_EXPRESS",
+                                    String.format("Hóa đơn: %d\nChi tiết sự cố: %s\n\nThông tin người giao hàng: %s\nThông tin người nhận hàng: %s\n",
+                                    orders.getId(),
+                                    createOrder.get("message").toString(),
+                                    orderAgency.getAgency().toString(),
+                                    customerAddressBook.toString()));
+                        }
+                    }catch (Exception exception){
+                        System.out.println(exception.getMessage());
+                    }
                     this.ordersAgencyRepository.save(orderAgency);
                     for (CartItem cartItem: v.getValue()){
                         OrderDetail orderDetail = new OrderDetail();
@@ -268,7 +302,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Map<String, String> getMomoPaymentInfo(User user) throws RuntimeException{
+    public Map<String, String> getMomoPaymentInfo(User user, Double shipFee) throws RuntimeException{
         Map<String, String> result = new HashMap<>();
         try {
             Map<String, String> res = null;
@@ -289,7 +323,7 @@ public class CartServiceImpl implements CartService {
             }
             if (cartItemList.size() > 0){
                 String id = this.utils.generateUUID();
-                int amount = (int)((double) getTotalPriceInCart(cart));
+                int amount = (int)(double)(getTotalPriceInCart(cart) +  shipFee);
                 String amountStr = String.valueOf(amount);
                 System.out.println(amountStr);
                 res = this.momoPaymentUtils.getPaymentInfo(id, amountStr, orderInfo, id);

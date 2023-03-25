@@ -132,6 +132,8 @@ public class CartController {
     @PostMapping(path = "/payment-cart/{paymentTypeID}/{addressID}")
     public ResponseEntity<ModelResponse> paymentCart(@PathVariable(value = "paymentTypeID") String paymentTypeID,
                                                      @PathVariable(value = "addressID") String addressID,
+                                                     @RequestParam(defaultValue = "-1") String serviceTypeID,
+                                                     @RequestParam(defaultValue = "-1") String serviceID,
                                                    HttpServletRequest request){
         String ms = "Payment cart successfully";
         String code = "200";
@@ -139,6 +141,14 @@ public class CartController {
         try {
             if (request.getHeader("Authorization") == null){
                 throw new RuntimeException("Authorization info not found");
+            }
+            Integer serviceTypeIDInput = null;
+            Integer serviceIDInput = null;
+            if (serviceID != "-1"){
+                serviceIDInput = Integer.parseInt(serviceID);
+            }
+            if (serviceTypeID != "-1"){
+                serviceTypeIDInput = Integer.parseInt(serviceTypeID);
             }
             String token = request.getHeader("Authorization").split("\s")[1];
             List<User> list = this.userService.getUserByUsername(jwtTokenUtils.getUsernameFromToken(token));
@@ -151,7 +161,7 @@ public class CartController {
             if (customerAddressBook.getCustomer().getId() != user.getId()){
                 throw new RuntimeException("Invalid address !!!");
             }
-            res = this.cartService.paymentCart(user,paymentType, customerAddressBook);
+            res = this.cartService.paymentCart(user,paymentType, customerAddressBook, serviceIDInput, serviceTypeIDInput);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
@@ -163,7 +173,8 @@ public class CartController {
 
 
     @PostMapping(path = "/get-momo-payment-info")
-    public ResponseEntity<ModelResponse> getMomoPaymentInfo(HttpServletRequest request){
+    public ResponseEntity<ModelResponse> getMomoPaymentInfo(HttpServletRequest request,
+                                                            @RequestParam(defaultValue = "0") String amountShipFee){
         String ms = "Get payment info successfully";
         String code = "200";
         Map<String, String> res = null;
@@ -171,13 +182,14 @@ public class CartController {
             if (request.getHeader("Authorization") == null){
                 throw new RuntimeException("Authorization info not found");
             }
+            Double shipFee = Double.parseDouble(amountShipFee);
             String token = request.getHeader("Authorization").split("\s")[1];
             List<User> list = this.userService.getUserByUsername(jwtTokenUtils.getUsernameFromToken(token));
             if (list.size() == 0){
                 throw new RuntimeException("Can not find current user");
             }
             User user = list.get(0);
-            res = this.cartService.getMomoPaymentInfo(user);
+            res = this.cartService.getMomoPaymentInfo(user, shipFee);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";

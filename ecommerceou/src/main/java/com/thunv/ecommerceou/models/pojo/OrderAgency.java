@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -29,6 +30,19 @@ public class OrderAgency {
     @JoinColumn(name = "orders",referencedColumnName = "id")
     @Getter @Setter
     private Orders orders;
+
+    @Column(name = "expected_delivery_time")
+    @Getter @Setter
+    private String expectedDeliveryTime;
+
+    @Column(name = "order_express_id")
+    @Getter @Setter
+    private String orderExpressID;
+
+    @Column(name = "ship_fee")
+    @Getter @Setter
+    private Double shipFee;
+
     @ManyToOne
     @JoinColumn(name = "order_state",referencedColumnName = "id")
     @Getter @Setter
