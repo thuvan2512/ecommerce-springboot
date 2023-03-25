@@ -310,7 +310,7 @@ public class GHNExpressUtils {
                             String.format("    \"return_district_name\": \"%s\", \n", agency.getFromDistrictName()) +
                             String.format("    \"return_province_name\": \"%s\", \n", agency.getFromProvinceName()) +
                             String.format("    \"client_order_code\": \"%s\", \n", "") +
-                            String.format("    \"to_name\": \"%s\", \n", customerAddressBook.getCustomer().getUsername()) +
+                            String.format("    \"to_name\": \"%s\", \n", customerAddressBook.getCustomerName()) +
                             String.format("    \"to_phone\": \"%s\", \n", customerAddressBook.getDeliveryPhone()) +
                             String.format("    \"to_address\": \"%s\", \n", customerAddressBook.getToAddress()) +
                             String.format("    \"to_ward_name\": \"%s\", \n", customerAddressBook.getToWardName()) +

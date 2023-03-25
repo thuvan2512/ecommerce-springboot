@@ -16,6 +16,10 @@ public class AddressBookCreateDTO {
     @Getter @Setter
     private String fullAddress;
 
+    @NotNull(message = "Customer name can't be not null")
+    @Getter @Setter
+    private String customerName;
+
     @NotNull(message = "Address type can't be not null")
     @Getter @Setter
     private String addressType;
@@ -58,6 +62,7 @@ public class AddressBookCreateDTO {
 
     public CustomerAddressBook loadCustomerAddressDTO(CustomerAddressBook customerAddressBook) throws RuntimeException{
         customerAddressBook.setFullAddress(this.getFullAddress());
+        customerAddressBook.setCustomerName(this.getCustomerName());
         customerAddressBook.setAddressType(this.getAddressType());
         customerAddressBook.setDeliveryPhone(this.getDeliveryPhone());
         customerAddressBook.setDescription(this.getDescription());
