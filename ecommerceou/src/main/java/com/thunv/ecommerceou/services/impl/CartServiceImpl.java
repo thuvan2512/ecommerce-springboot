@@ -157,7 +157,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook, Integer serviceID, Integer serviceTypeID) throws RuntimeException{
+    public List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook, Map<Integer, Map<String, String>> mapServiceInfo) throws RuntimeException{
         try {
             if (this.utils.checkPhoneNumberIsValid(customerAddressBook.getDeliveryPhone())== false){
                 throw new RuntimeException("Invalid phone !!!");
@@ -187,9 +187,12 @@ public class CartServiceImpl implements CartService {
                     orders.setPaymentState(0);
                 }
                 orders.setAuthor(user);
-                this.ordersRepository.save(orders);
                 Map<Integer, List<CartItem>> groupItemByAgency =
                         cartItemList.stream().collect(Collectors.groupingBy(item -> item.getItemPost().getSalePost().getAgency().getId()));
+                if (groupItemByAgency.keySet().equals(mapServiceInfo.keySet()) == false ){
+                    throw new RuntimeException("Invalid input !!!");
+                }
+                this.ordersRepository.save(orders);
                 for (Map.Entry<Integer,  List<CartItem>> v : groupItemByAgency.entrySet()) {
                     OrderAgency orderAgency = new OrderAgency();
                     orderAgency.setDeliveryInfo(customerAddressBook);
@@ -212,7 +215,16 @@ public class CartServiceImpl implements CartService {
                             amountCOD = 0;
                         }
                         Agency agencyShip = this.agencyService.getAgencyByID(v.getKey());
-                        Map<Object, Object> createOrder = this.orderTrackingService.createOrderOfGHNExpress(payShipType, agencyShip, customerAddressBook, v.getValue(), serviceID, serviceTypeID, amountCOD);
+                        Map<String, String> serviceInfo = mapServiceInfo.get(agencyShip.getId());
+                        Integer serviceTypeIDInput = null;
+                        Integer serviceIDInput = null;
+                        if (serviceInfo.get("serviceID") != null) {
+                            serviceIDInput = Integer.parseInt(serviceInfo.get("serviceID"));
+                        }
+                        if (serviceInfo.get("serviceTypeID") != null) {
+                            serviceTypeIDInput = Integer.parseInt(serviceInfo.get("serviceTypeID"));
+                        }
+                        Map<Object, Object> createOrder = this.orderTrackingService.createOrderOfGHNExpress(payShipType, agencyShip, customerAddressBook, v.getValue(), serviceIDInput, serviceTypeIDInput, amountCOD);
                         if (String.valueOf(createOrder.get("code")).equals("200")){
                             Map<Object, Object> createOrderTemp= (Map<Object,Object>) createOrder.get("data");
                             System.out.println(createOrderTemp.toString());

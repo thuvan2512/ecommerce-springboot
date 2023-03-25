@@ -132,8 +132,7 @@ public class CartController {
     @PostMapping(path = "/payment-cart/{paymentTypeID}/{addressID}")
     public ResponseEntity<ModelResponse> paymentCart(@PathVariable(value = "paymentTypeID") String paymentTypeID,
                                                      @PathVariable(value = "addressID") String addressID,
-                                                     @RequestParam(defaultValue = "-1") String serviceTypeID,
-                                                     @RequestParam(defaultValue = "-1") String serviceID,
+                                                     @RequestBody Map<Integer, Map<String, String>> mapServiceInfo,
                                                    HttpServletRequest request){
         String ms = "Payment cart successfully";
         String code = "200";
@@ -141,14 +140,6 @@ public class CartController {
         try {
             if (request.getHeader("Authorization") == null){
                 throw new RuntimeException("Authorization info not found");
-            }
-            Integer serviceTypeIDInput = null;
-            Integer serviceIDInput = null;
-            if (serviceID != "-1"){
-                serviceIDInput = Integer.parseInt(serviceID);
-            }
-            if (serviceTypeID != "-1"){
-                serviceTypeIDInput = Integer.parseInt(serviceTypeID);
             }
             String token = request.getHeader("Authorization").split("\s")[1];
             List<User> list = this.userService.getUserByUsername(jwtTokenUtils.getUsernameFromToken(token));
@@ -161,7 +152,7 @@ public class CartController {
             if (customerAddressBook.getCustomer().getId() != user.getId()){
                 throw new RuntimeException("Invalid address !!!");
             }
-            res = this.cartService.paymentCart(user,paymentType, customerAddressBook, serviceIDInput, serviceTypeIDInput);
+            res = this.cartService.paymentCart(user,paymentType, customerAddressBook, mapServiceInfo);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
