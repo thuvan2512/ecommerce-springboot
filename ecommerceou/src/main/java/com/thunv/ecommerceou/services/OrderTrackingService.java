@@ -11,6 +11,7 @@ public interface OrderTrackingService {
     Map<Object, Object> getLocationProvincesOfGHNExpress();
     Map<Object, Object> getLocationDistrictsOfGHNExpress(int provinceID);
     Map<Object, Object> getLocationWardsOfGHNExpress(int districtID);
+    Map<Object, Object> generateTokenToPrintOrderOfGHNExpress(String orderCode);
     Map<Object, Object> getAvailableServiceShippingOfGHNExpress(int fromDistrictID, String fromWard, int toDistrictID, String toWardID);
     Map<Object, Object> createOrderOfGHNExpress(Integer paymentTypeOfGHN, Agency agency, CustomerAddressBook customerAddressBook, List<CartItem> listItem, Integer serviceID, Integer serviceTypeID, Integer amountCOD);
 }

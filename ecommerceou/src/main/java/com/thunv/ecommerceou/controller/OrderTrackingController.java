@@ -6,8 +6,10 @@ import com.thunv.ecommerceou.models.pojo.OrderAgency;
 import com.thunv.ecommerceou.res.ModelResponse;
 import com.thunv.ecommerceou.services.AgencyService;
 import com.thunv.ecommerceou.services.CustomerAddressBookService;
+import com.thunv.ecommerceou.services.OrderService;
 import com.thunv.ecommerceou.services.OrderTrackingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +25,14 @@ public class OrderTrackingController {
     @Autowired
     private OrderTrackingService orderTrackingService;
     @Autowired
+    private Environment env;
+    @Autowired
     private CustomerAddressBookService customerAddressBookService;
     @Autowired
     private AgencyService agencyService;
+    @Autowired
+    private OrderService orderService;
+
     @GetMapping(value = "/ghn/location/get-provinces")
     public ResponseEntity<ModelResponse> getLocationProvincesOfGHNExpress(){
         String ms ;
@@ -140,6 +147,51 @@ public class OrderTrackingController {
                 }
             }else {
                 throw new RuntimeException("Input not found !!!");
+            }
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code, ms, res)
+        );
+    }
+
+    @GetMapping(value = "/ghn/order/print-order/{orderAgentID}")
+    public ResponseEntity<ModelResponse> printOrderOfGHNExpress(@PathVariable(value = "orderAgentID") String orderAgentID,
+                                                                @RequestParam(defaultValue = "1") String printSize){
+        String ms ;
+        String code;
+        Map<Object, Object> res = new HashMap<>();
+        HttpStatus status;
+        try {
+            OrderAgency orderAgency = this.orderService.getOrderAgencyByID(Integer.parseInt(orderAgentID));
+            String orderCode = orderAgency.getOrderExpressID();
+            if (orderCode == null){
+                throw new RuntimeException("Not found order code provided by GHN Express. Please contact to admin to resolve your problem !!!");
+            }
+            String url;
+            switch (printSize){
+                case "2":
+                    url = env.getProperty("ghn.printOrder.52x70").toString();
+                    break;
+                case "3":
+                    url = env.getProperty("ghn.printOrder.80x80").toString();
+                    break;
+                default:
+                    url = env.getProperty("ghn.printOrder.a5").toString();
+                    break;
+            }
+            Map<Object, Object> temp = this.orderTrackingService.generateTokenToPrintOrderOfGHNExpress(orderCode);
+            if(String.valueOf(temp.get("code")).equals("200")){
+                String token = ((Map<Object, Object>) temp.get("data")).get("token").toString();
+                res.put("urlPrintOrder", String.format("%s%s", url, token));
+                code = "200";
+                ms = "Get delivery services of Giao Hang Nhanh Express successfully !!!";
+                status = HttpStatus.OK;
+            }else {
+                throw new RuntimeException(temp.get("message").toString());
             }
         }catch (Exception ex){
             ms = ex.getMessage();
