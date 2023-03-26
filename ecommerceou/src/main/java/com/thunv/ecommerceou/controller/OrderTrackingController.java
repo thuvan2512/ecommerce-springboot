@@ -1,19 +1,16 @@
 package com.thunv.ecommerceou.controller;
 
-import com.thunv.ecommerceou.models.pojo.Agency;
-import com.thunv.ecommerceou.models.pojo.CustomerAddressBook;
-import com.thunv.ecommerceou.models.pojo.OrderAgency;
+import com.thunv.ecommerceou.jwt.JwtTokenUtils;
+import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.res.ModelResponse;
-import com.thunv.ecommerceou.services.AgencyService;
-import com.thunv.ecommerceou.services.CustomerAddressBookService;
-import com.thunv.ecommerceou.services.OrderService;
-import com.thunv.ecommerceou.services.OrderTrackingService;
+import com.thunv.ecommerceou.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +29,10 @@ public class OrderTrackingController {
     private AgencyService agencyService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private JwtTokenUtils jwtTokenUtils;
 
     @GetMapping(value = "/ghn/location/get-provinces")
     public ResponseEntity<ModelResponse> getLocationProvincesOfGHNExpress(){
@@ -123,32 +124,42 @@ public class OrderTrackingController {
 
     @GetMapping(value = "/ghn/order/get-service-package-of-ghn-express")
     public ResponseEntity<ModelResponse> getAvailableServiceShippingOfGHNExpress(@RequestParam(defaultValue = "0") String addressBookID,
-                                                                                 @RequestParam(defaultValue = "0") String agencyID){
+                                                                                 @RequestParam(defaultValue = "0") String agencyID,
+                                                                                 HttpServletRequest request){
         String ms ;
         String code;
         Map<Object, Object> res = new HashMap<>();
         HttpStatus status;
         try {
+            if (request.getHeader("Authorization") == null){
+                throw new RuntimeException("Authorization info not found");
+            }
+            String token = request.getHeader("Authorization").split("\s")[1];
+            List<User> list = this.userService.getUserByUsername(jwtTokenUtils.getUsernameFromToken(token));
+            if (list.size() == 0){
+                throw new RuntimeException("Can not find current user");
+            }
+            User user = list.get(0);
             CustomerAddressBook customerAddressBook = this.customerAddressBookService.getAddressByID(Integer.parseInt(addressBookID));
+            if (customerAddressBook.getCustomer().getId() != user.getId()){
+                throw new RuntimeException("Invalid address !!!");
+            }
             Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
-            Integer fromDistrict = agency.getDistrictID();
-            String fromWard = agency.getWardID();
-            Integer toDistrict = customerAddressBook.getDistrictID();
-            String toWard = customerAddressBook.getWardID();
-            if (fromDistrict != null && toDistrict != null && toWard != null){
-                Map<Object, Object> temp = this.orderTrackingService.getAvailableServiceShippingOfGHNExpress(fromDistrict,fromWard, toDistrict, toWard);
-                if(String.valueOf(temp.get("code")).equals("200")){
-                    res.put("services", temp.get("data"));
-                    code = "200";
-                    ms = "Get delivery services of Giao Hang Nhanh Express successfully !!!";
-                    status = HttpStatus.OK;
-                }else {
-                    throw new RuntimeException(temp.get("message").toString());
-                }
+//            Integer fromDistrict = agency.getDistrictID();
+//            String fromWard = agency.getWardID();
+//            Integer toDistrict = customerAddressBook.getDistrictID();
+//            String toWard = customerAddressBook.getWardID();
+            Map<Object, Object> temp = this.orderTrackingService.getAvailableServiceShippingOfGHNExpress(user, agency, customerAddressBook);
+            if(String.valueOf(temp.get("code")).equals("200")){
+                res.put("services", temp.get("data"));
+                code = "200";
+                ms = "Get delivery services of Giao Hang Nhanh Express successfully !!!";
+                status = HttpStatus.OK;
             }else {
-                throw new RuntimeException("Input not found !!!");
+                throw new RuntimeException(temp.get("message").toString());
             }
         }catch (Exception ex){
+            ex.printStackTrace();
             ms = ex.getMessage();
             code = "400";
             status = HttpStatus.BAD_REQUEST;
