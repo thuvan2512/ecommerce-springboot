@@ -305,6 +305,26 @@ public class SalePostController {
                 new ModelResponse(code,ms,searchResponse)
         );
     }
+    @GetMapping(value = "/get-keywords-suggest-for-search")
+    public ResponseEntity<ModelResponse> getSuggestKeywordForSearch(@RequestParam(defaultValue = "") String keyword){
+        String ms;
+        String code;
+        List<Object> res = null;
+        HttpStatus status;
+        try {
+            res = this.salePostService.getSuggestForSearchProducts(keyword);
+            ms = "Get suggest successfully !!!";
+            code = "200";
+            status = HttpStatus.OK;
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
     @PutMapping(path = "/{postID}")
     public ResponseEntity<ModelResponse> updateSalePost(@RequestBody @Valid SalePostUpdateDTO salePostUpdateDTO,
                                                         @PathVariable(value = "postID") String postID,

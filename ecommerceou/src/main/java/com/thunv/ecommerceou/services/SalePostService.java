@@ -14,6 +14,8 @@ public interface SalePostService {
     SalePost getSalePostByID(int postID);
     List<SalePost> getAllSalePost();
     List<SalePost> searchSalePost(SearchSalePostDTO searchSalePostDTO);
+
+    List<Object> getSuggestForSearchProducts(String keyword);
     List<SalePost> getListSalePostLikeByUser(User user);
     List<SalePost> getListSalePostUnpublished(Agency agency);
     List<SalePost> getListSalePostPublished(Agency agency);

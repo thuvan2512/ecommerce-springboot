@@ -3,6 +3,7 @@ package com.thunv.ecommerceou.repositories.impl;
 import com.thunv.ecommerceou.dto.SearchSalePostDTO;
 import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.repositories.custom.SalePostRepositoryCustom;
+import com.thunv.ecommerceou.services.SalePostService;
 import com.thunv.ecommerceou.utils.Utils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -12,10 +13,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +28,8 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
     private Utils utils;
     @Autowired
     private Environment env;
+    @Autowired
+    private SalePostService salePostService;
     @Override
     public List<SalePost> searchSalePost(SearchSalePostDTO searchSalePostDTO) throws RuntimeException{
         Session session = this.sessionFactoryBean.getObject().getCurrentSession();
@@ -39,10 +39,18 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
 //        Root rootAgenct = criteriaQuery.from(Agency.class);
         criteriaQuery.select(root);
         List<Predicate> predicates1 = new ArrayList<>();
+        List<Predicate> predicatesKeyword = new ArrayList<>();
         String kw = searchSalePostDTO.getKw();
-        if (kw != null && !kw.isEmpty()) {
-            Predicate p1 = criteriaBuilder.like(root.get("title").as(String.class), String.format("%%%s%%", kw));
-            predicates1.add(p1);
+        if (kw != null && !kw.isEmpty() && kw.strip() != "") {
+            List<Object> listKeyResults = this.salePostService.getSuggestForSearchProducts(kw);
+            System.out.println(listKeyResults.size());
+            for (Object key: listKeyResults){
+                predicatesKeyword.add(criteriaBuilder.like(root.get("title").as(String.class), String.format("%%%s%%", key.toString())));
+            }
+            Predicate pcKeyword = criteriaBuilder.or(predicatesKeyword.toArray(new Predicate[]{}));
+            predicates1.add(pcKeyword);
+        }else {
+            predicates1.add(criteriaBuilder.equal(root.get("title").as(String.class),"none"));
         }
         Double fp = searchSalePostDTO.getFromPrice();
         if (fp != null) {
@@ -93,6 +101,7 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
 //        Predicate finalPre = criteriaBuilder.or(mainPre.toArray(new Predicate[]{}));
         criteriaQuery.where(predicates1.toArray(new Predicate[]{}));
         criteriaQuery.orderBy(criteriaBuilder.desc(root.get("createdDate")));
+        criteriaQuery.orderBy(criteriaBuilder.desc( criteriaBuilder.locate(root.get("title"),kw.toString())));
         Query query = session.createQuery(criteriaQuery);
         int page = searchSalePostDTO.getPage();
         if (page > 0){

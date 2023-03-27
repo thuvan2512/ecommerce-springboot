@@ -62,6 +62,16 @@ public class SalePostServiceImpl implements SalePostService {
     }
 
     @Override
+    public List<Object> getSuggestForSearchProducts(String keyword) throws RuntimeException{
+        try {
+            return this.salePostRepository.getSuggestForSearchProducts(keyword);
+        } catch (Exception ex) {
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
     public List<SalePost> getListSalePostLikeByUser(User user) throws RuntimeException {
         try {
             return this.salePostRepository.getListSalePostLikeByUser(user);
