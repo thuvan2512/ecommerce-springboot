@@ -41,7 +41,7 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         List<Predicate> predicates1 = new ArrayList<>();
         List<Predicate> predicatesKeyword = new ArrayList<>();
         String kw = searchSalePostDTO.getKw();
-        if (kw != null && !kw.isEmpty() && kw.strip() != "") {
+        if (kw != null && !kw.isEmpty()) {
             List<Object> listKeyResults = this.salePostService.getSuggestForSearchProducts(kw);
             System.out.println(listKeyResults.size());
             for (Object key: listKeyResults){
@@ -49,8 +49,6 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
             }
             Predicate pcKeyword = criteriaBuilder.or(predicatesKeyword.toArray(new Predicate[]{}));
             predicates1.add(pcKeyword);
-        }else {
-            predicates1.add(criteriaBuilder.equal(root.get("title").as(String.class),"none"));
         }
         Double fp = searchSalePostDTO.getFromPrice();
         if (fp != null) {
@@ -101,7 +99,9 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
 //        Predicate finalPre = criteriaBuilder.or(mainPre.toArray(new Predicate[]{}));
         criteriaQuery.where(predicates1.toArray(new Predicate[]{}));
         criteriaQuery.orderBy(criteriaBuilder.desc(root.get("createdDate")));
-        criteriaQuery.orderBy(criteriaBuilder.desc( criteriaBuilder.locate(root.get("title"),kw.toString())));
+        if (kw != null){
+            criteriaQuery.orderBy(criteriaBuilder.desc( criteriaBuilder.locate(root.get("title"),kw.toString())));
+        }
         Query query = session.createQuery(criteriaQuery);
         int page = searchSalePostDTO.getPage();
         if (page > 0){
