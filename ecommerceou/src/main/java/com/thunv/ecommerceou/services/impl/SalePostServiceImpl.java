@@ -101,6 +101,16 @@ public class SalePostServiceImpl implements SalePostService {
         }
     }
 
+    @Override
+    public List<SalePost> getAllSalePostByAgency(Agency agency) {
+        try {
+            return this.salePostRepository.findByAgency(agency);
+        } catch (Exception ex) {
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
 
     @Override
     public SalePost publishSalePost(SalePost salePost) throws RuntimeException {
