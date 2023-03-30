@@ -19,6 +19,8 @@ public interface SalePostService {
     List<SalePost> getListSalePostLikeByUser(User user);
     List<SalePost> getListSalePostUnpublished(Agency agency);
     List<SalePost> getListSalePostPublished(Agency agency);
+
+    List<SalePost> getAllSalePostByAgency(Agency agency);
     SalePost publishSalePost(SalePost salePost);
     SalePost unPublishSalePost(SalePost salePost);
     Integer countSalePost();

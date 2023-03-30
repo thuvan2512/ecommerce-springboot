@@ -73,6 +73,29 @@ public class SalePostController {
                 new ModelResponse(code,ms,list)
         );
     }
+
+    @GetMapping(value = "/get-all-sale-post-by-agency-id/{agencyID}")
+    public ResponseEntity<ModelResponse> getAllSalePostByAgencyID(@PathVariable(value = "agencyID") String agencyID){
+        String ms;
+        String code;
+        List<SalePost> list = null;
+        HttpStatus status;
+        try {
+            Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
+            list = this.salePostService.getAllSalePostByAgency(agency);
+            ms = "Get all sale post by agency id successfully";
+            code = "200";
+            status = HttpStatus.OK;
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
+
     @GetMapping(value = "/published/{agencyID}/all")
     public ResponseEntity<ModelResponse> getAllSalePostPublished(@PathVariable(value = "agencyID") String agencyID){
         String ms = "Get all sale post published successfully";

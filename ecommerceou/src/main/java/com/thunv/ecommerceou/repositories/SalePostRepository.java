@@ -13,4 +13,6 @@ public interface SalePostRepository extends JpaRepository<SalePost,Integer>, Sal
 
     @Query(value = "SELECT title FROM sale_post WHERE MATCH (title) AGAINST (:keyword) > 0 ORDER BY MATCH (title) AGAINST (:keyword) DESC LIMIT 0,10;", nativeQuery = true)
     List<Object> getSuggestForSearchProducts(@Param("keyword") String keyword);
+
+    List<SalePost> findByAgency(Agency agency);
 }
