@@ -28,6 +28,7 @@ public class AddressBookCreateDTO {
     @Getter @Setter
     private String deliveryPhone;
 
+    @NotNull(message = "Note can't be not null")
     @Getter @Setter
     private String description;
 

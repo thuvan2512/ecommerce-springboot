@@ -343,7 +343,7 @@ public class GHNExpressUtils {
                     .addHeader("Token", token)
                     .bodyString("{\n" +
                             String.format("    \"payment_type_id\": %d, \n", paymentTypeOfGHN) +
-                            String.format("    \"note\": \"%s\", \n", "Please call before delivery") +
+                            String.format("    \"note\": \"%s\", \n", customerAddressBook.getDescription()) +
                             String.format("    \"from_name\": \"%s\", \n", agency.getName()) +
                             String.format("    \"from_phone\": \"%s\", \n", agency.getHotline()) +
                             String.format("    \"from_address\": \"%s\", \n", agency.getFromAddress()) +
