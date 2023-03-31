@@ -159,6 +159,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook, Map<Integer, Map<String, String>> mapServiceInfo) throws RuntimeException{
         try {
+            Double shipFee = 0.0;
             if (this.utils.checkPhoneNumberIsValid(customerAddressBook.getDeliveryPhone())== false){
                 throw new RuntimeException("Invalid phone !!!");
             }
@@ -230,6 +231,7 @@ public class CartServiceImpl implements CartService {
                             System.out.println(createOrderTemp.toString());
                             orderAgency.setOrderExpressID(createOrderTemp.get("order_code").toString());
                             orderAgency.setShipFee(Double.parseDouble(createOrderTemp.get("total_fee").toString()));
+                            shipFee += Double.parseDouble(createOrderTemp.get("total_fee").toString());
                             orderAgency.setExpectedDeliveryTime(createOrderTemp.get("expected_delivery_time").toString());
                             System.out.println(orderAgency.getOrderExpressID());
                         }else {
@@ -260,7 +262,7 @@ public class CartServiceImpl implements CartService {
                 String title = String.format("Dear %s,", user.getUsername());
                 String content = "We have received your order";
                 String mailTemplate = "mail";
-                String items = this.utils.customMailForPayment(cartItemList);
+                String items = this.utils.customMailForPayment(cartItemList, shipFee);
                 this.mailService.sendMail(mailTo,subject,title,content,items,mailTemplate);
                 for (CartItem cartItem: cartItemList){
                     this.cartItemRepository.deleteById(cartItem.getId());

@@ -67,6 +67,50 @@ public class OrderTrackingServiceImpl implements OrderTrackingService {
     }
 
     @Override
+    public Map<Object, Object> cancelOrderOfGHNExpress(String orderCode) {
+        try {
+            Map<Object, Object> results = this.ghnExpressUtils.cancelOrderOfGHNExpress(orderCode);
+            return results;
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
+        return new HashMap<>();
+    }
+
+    @Override
+    public Map<Object, Object> reviewOrderOfGHNExpress(String orderCode) {
+        try {
+            Map<Object, Object> results = this.ghnExpressUtils.reviewOrderOfGHNExpress(orderCode);
+            return results;
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
+        return new HashMap<>();
+    }
+
+    @Override
+    public Map<Object, Object> getPickShiftOfGHNExpress() {
+        try {
+            Map<Object, Object> results = this.ghnExpressUtils.getPickShiftOfGHNExpress();
+            return results;
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
+        return new HashMap<>();
+    }
+
+    @Override
+    public Map<Object, Object> setPickShiftOfGHNExpress(String orderCode, Integer pickShiftID) {
+        try {
+            Map<Object, Object> results = this.ghnExpressUtils.setPickShiftForOrderOfGHNExpress(orderCode, pickShiftID);
+            return results;
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
+        return new HashMap<>();
+    }
+
+    @Override
     public Map<Object, Object> getAvailableServiceShippingOfGHNExpress(User user, Agency agency, CustomerAddressBook customerAddressBook) throws RuntimeException{
         try {
             List<Object> mapResult = new ArrayList<>();

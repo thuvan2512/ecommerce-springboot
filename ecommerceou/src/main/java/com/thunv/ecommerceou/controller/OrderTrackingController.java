@@ -213,4 +213,124 @@ public class OrderTrackingController {
                 new ModelResponse(code, ms, res)
         );
     }
+
+    @GetMapping(value = "/ghn/order/review-order-info/{orderAgentID}")
+    public ResponseEntity<ModelResponse> reviewOrderOfGHNExpress(@PathVariable(value = "orderAgentID") String orderAgentID){
+        String ms ;
+        String code;
+        Map<Object, Object> res = new HashMap<>();
+        HttpStatus status;
+        try {
+            OrderAgency orderAgency = this.orderService.getOrderAgencyByID(Integer.parseInt(orderAgentID));
+            if (orderAgency.getOrderExpressID() == null){
+                throw new RuntimeException("Shipping information has not been initialized because delivery partner problems. " +
+                        "Please contact admin to process or cancel this order !!!");
+            }else {
+                Map<Object, Object> temp = this.orderTrackingService.reviewOrderOfGHNExpress(orderAgency.getOrderExpressID());
+                if(String.valueOf(temp.get("code")).equals("200")){
+                    Map<Object, Object> dataRS = (Map<Object, Object>) temp.get("data");
+                    Object payment_type_id = dataRS.get("payment_type_id");
+                    String paymentType = "";
+                    if (payment_type_id != null){
+                        if ((int) payment_type_id == 1){
+                            paymentType = "Pre-paid order (E-Wallet)";
+                        }else {
+                            paymentType = "Post-paid orders (COD)";
+                        }
+                    }
+                    res.put("logInfo", dataRS.get("log"));
+                    res.put("orderCode", dataRS.get("order_code"));
+                    res.put("orderDate", dataRS.get("order_date"));
+                    res.put("expectedDeliveryTime", dataRS.get("leadtime"));
+                    res.put("customerName", dataRS.get("to_name"));
+                    res.put("customerPhone", dataRS.get("to_phone"));
+                    res.put("customerAddress", dataRS.get("to_address"));
+                    res.put("amountCOD", dataRS.get("cod_amount"));
+                    res.put("note", dataRS.get("note"));
+                    res.put("content", dataRS.get("content"));
+                    res.put("pickUpShift", dataRS.get("pickup_shift"));
+                    res.put("pickUpTimeOfShipper", dataRS.get("updated_date_pick_shift"));
+                    res.put("orderStatus", dataRS.get("status"));
+                    res.put("paymentType", paymentType);
+
+                }else {
+                    throw new RuntimeException(temp.get("message").toString());
+                }
+            }
+            ms = "Get order info of GHN Express successfully !!!";
+            code = "200";
+            status = HttpStatus.OK;
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code, ms, res)
+        );
+    }
+
+    @GetMapping(value = "/ghn/order/get-pick-shift")
+    public ResponseEntity<ModelResponse> getPickShiftOfGHNExpress(){
+        String ms ;
+        String code;
+        Map<Object, Object> res = new HashMap<>();
+        HttpStatus status;
+        try {
+
+            Map<Object, Object> temp = this.orderTrackingService.getPickShiftOfGHNExpress();
+            if(String.valueOf(temp.get("code")).equals("200")){
+                res.put("listPickShift", temp.get("data"));
+            }else {
+                throw new RuntimeException(temp.get("message").toString());
+            }
+            ms = "Get pick shift of GHN Express successfully !!!";
+            code = "200";
+            status = HttpStatus.OK;
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code, ms, res)
+        );
+    }
+
+    @GetMapping(value = "/ghn/order/set-pick-shift/{orderAgencyID}/{pickShiftID}")
+    public ResponseEntity<ModelResponse> setPickShiftOfGHNExpress(@PathVariable(value = "orderAgencyID") String orderAgencyID,
+                                                                  @PathVariable(value = "pickShiftID") String pickShiftID){
+        String ms ;
+        String code;
+        Map<Object, Object> res = new HashMap<>();
+        HttpStatus status;
+        try {
+            OrderAgency orderAgency = this.orderService.getOrderAgencyByID(Integer.parseInt(orderAgencyID));
+            Integer pickShip = Integer.parseInt(pickShiftID);
+            if (orderAgency.getOrderExpressID() == null){
+                throw new RuntimeException("Shipping information has not been initialized because delivery partner problems. " +
+                        "Please contact admin to process or cancel this order !!!");
+            }else {
+                if (orderAgency.getOrderState().getId() == 6){
+                    throw new RuntimeException("This order has been canceled");
+                }
+                Map<Object, Object> temp = this.orderTrackingService.setPickShiftOfGHNExpress(orderAgency.getOrderExpressID(), pickShip);
+                if(String.valueOf(temp.get("code")).equals("200")){
+                    ms = "Set pick shift of GHN Express successfully !!!";
+                    code = "200";
+                    status = HttpStatus.OK;
+                }else {
+                    throw new RuntimeException(temp.get("message").toString());
+                }
+            }
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code, ms, res)
+        );
+    }
+
 }
