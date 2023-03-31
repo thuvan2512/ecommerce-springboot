@@ -39,6 +39,12 @@ public class GHNExpressUtils {
     private static final String GHN_EXPRESS_LINK_CREATE_ORDER = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create";
     private static final String GHN_EXPRESS_LINK_PREVIEW_ORDER = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/preview";
     private static final String GHN_EXPRESS_LINK_GENERATE_TOKEN_PRINT_ORDER = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/a5/gen-token";
+    private static final String GHN_EXPRESS_LINK_CANCEL_ORDER = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/switch-status/cancel";
+    private static final String GHN_EXPRESS_LINK_REVIEW_ORDER = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail";
+    private static final String GHN_EXPRESS_LINK_GET_PICK_SHIFT = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shift/date";
+    private static final String GHN_EXPRESS_LINK_UPDATE_ORDER = "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/update";
+
+
 
     public Map<Object, Object> getLocationProvinceOfGHNExpress() throws ClientProtocolException, IOException {
         String token = env.getProperty("ghn.token.production");
@@ -491,6 +497,108 @@ public class GHNExpressUtils {
                     .execute().returnResponse();
             String temp = new String(EntityUtils.toByteArray(response.getEntity()));
 //            System.out.println(temp);
+            ObjectMapper mapper = new ObjectMapper();
+            mapResult = mapper.readValue(temp, Map.class);
+            return mapResult;
+        }catch (Exception exception){
+            System.out.printf("%s", exception.toString());
+        }
+        mapResult.put("message_err", "Có lỗi trong quá khi call api của GHN !!!");
+        return mapResult;
+    }
+
+    public Map<Object, Object> cancelOrderOfGHNExpress(String orderCode) throws ClientProtocolException, IOException {
+        String token = env.getProperty("ghn.token.sandbox");
+        String shopID = env.getProperty("ghn.shopManager.shopID");
+        Map<Object, Object> mapResult = new HashMap<>();
+        String orderCodeInput = String.format("[\"%s\"]", orderCode);
+        try {
+
+            HttpResponse response = Request.Post(GHN_EXPRESS_LINK_CANCEL_ORDER)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Token", token)
+                    .addHeader("ShopId", shopID)
+                    .bodyString("{\n" +
+                            String.format("    \"order_codes\": %s", orderCodeInput) +
+                            "\n}", ContentType.APPLICATION_JSON)
+                    .execute().returnResponse();
+            String temp = new String(EntityUtils.toByteArray(response.getEntity()));
+            System.out.println(temp);
+            ObjectMapper mapper = new ObjectMapper();
+            mapResult = mapper.readValue(temp, Map.class);
+            return mapResult;
+        }catch (Exception exception){
+            System.out.printf("%s", exception.toString());
+        }
+        mapResult.put("message_err", "Có lỗi trong quá khi call api của GHN !!!");
+        return mapResult;
+    }
+
+    public Map<Object, Object> reviewOrderOfGHNExpress(String orderCode) throws ClientProtocolException, IOException {
+        String token = env.getProperty("ghn.token.sandbox");
+        Map<Object, Object> mapResult = new HashMap<>();
+        try {
+
+            HttpResponse response = Request.Post(GHN_EXPRESS_LINK_REVIEW_ORDER)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Token", token)
+                    .bodyString("{\n" +
+                            String.format("    \"order_code\": \"%s\"", orderCode) +
+                            "\n}", ContentType.APPLICATION_JSON)
+                    .execute().returnResponse();
+            String temp = new String(EntityUtils.toByteArray(response.getEntity()));
+            System.out.println(temp);
+            ObjectMapper mapper = new ObjectMapper();
+            mapResult = mapper.readValue(temp, Map.class);
+            return mapResult;
+        }catch (Exception exception){
+            System.out.printf("%s", exception.toString());
+        }
+        mapResult.put("message_err", "Có lỗi trong quá khi call api của GHN !!!");
+        return mapResult;
+    }
+
+    public Map<Object, Object> getPickShiftOfGHNExpress() throws ClientProtocolException, IOException {
+        String token = env.getProperty("ghn.token.sandbox");
+        Map<Object, Object> mapResult = new HashMap<>();
+        try {
+
+            HttpResponse response = Request.Post(GHN_EXPRESS_LINK_GET_PICK_SHIFT)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Token", token)
+                    .bodyString("{\n" +
+                            "\n}", ContentType.APPLICATION_JSON)
+                    .execute().returnResponse();
+            String temp = new String(EntityUtils.toByteArray(response.getEntity()));
+            System.out.println(temp);
+            ObjectMapper mapper = new ObjectMapper();
+            mapResult = mapper.readValue(temp, Map.class);
+            return mapResult;
+        }catch (Exception exception){
+            System.out.printf("%s", exception.toString());
+        }
+        mapResult.put("message_err", "Có lỗi trong quá khi call api của GHN !!!");
+        return mapResult;
+    }
+
+    public Map<Object, Object> setPickShiftForOrderOfGHNExpress(String orderCode, Integer pickShiftID) throws ClientProtocolException, IOException {
+        String token = env.getProperty("ghn.token.sandbox");
+        String shopID = env.getProperty("ghn.shopManager.shopID");
+        Map<Object, Object> mapResult = new HashMap<>();
+        try {
+
+            HttpResponse response = Request.Post(GHN_EXPRESS_LINK_UPDATE_ORDER)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Content-Type", "text/plain")
+                    .addHeader("Token", token)
+                    .addHeader("ShopId", shopID)
+                    .bodyString("{\n" +
+                            String.format("    \"order_code\": \"%s\",\n", orderCode) +
+                            String.format("    \"pick_shift\": [%d]", pickShiftID) +
+                            "\n}", ContentType.APPLICATION_JSON)
+                    .execute().returnResponse();
+            String temp = new String(EntityUtils.toByteArray(response.getEntity()));
+            System.out.println(temp);
             ObjectMapper mapper = new ObjectMapper();
             mapResult = mapper.readValue(temp, Map.class);
             return mapResult;

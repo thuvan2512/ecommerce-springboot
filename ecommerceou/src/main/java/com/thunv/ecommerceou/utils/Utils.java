@@ -125,9 +125,10 @@ public class Utils {
         return null;
     }
 
-    public String customMailForPayment(List<CartItem> cartItemList){
+    public String customMailForPayment(List<CartItem> cartItemList, Double shipFee){
         try {
             String content = "";
+            Double total = this.cartService.getTotalPriceInCart(cartItemList.get(0).getCart());
             for (CartItem cartItem: cartItemList) {
                 content += "<tr style=\"border-bottom: 1px solid rgba(0,0,0,.05);\">\n"
                         + "                            <td valign=\"middle\" width=\"80%\" style=\"text-align:left; padding: 0 2.5em;\">\n"
@@ -148,7 +149,7 @@ public class Utils {
             }
             content += "    <tr style=\"border-bottom: 1px solid rgba(0,0,0,.05);\">\n"
                     + "                            <td valign=\"middle\" width=\"20%\" style=\"text-align:left; padding: 0 2.5em;\">\n"
-                    + String.format("<span class=\"price\" style=\"color: #000; font-size: 20px;\">Total: %,.0f VND</span>\n", this.cartService.getTotalPriceInCart(cartItemList.get(0).getCart()))
+                    + String.format("<span class=\"price\" style=\"color: #000; font-size: 16px;\">Total: %,.0f VND + %,.0f VND (ship fee) = %,.0f VND</span>\n", total, shipFee, total+shipFee)
                     + "                            </td>\n"
                     + "                        </tr>";
             return content;

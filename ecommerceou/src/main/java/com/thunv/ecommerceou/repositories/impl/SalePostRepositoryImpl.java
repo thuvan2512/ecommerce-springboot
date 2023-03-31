@@ -243,6 +243,8 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         predicates.add(p3);
         Predicate p5 = builder.equal(builder.function("YEAR", Integer.class, rootOrder.get("createdDate")), year);
         predicates.add(p5);
+        Predicate p6 = builder.notEqual(rootOrderAgency.get("orderState").get("id"), 6);
+        predicates.add(p6);
         query.where(predicates.toArray(new Predicate[]{}));
         query.multiselect(builder.function("MONTH", Integer.class, rootOrder.get("createdDate")), builder.sum(builder.prod(rootOrderDetail.get("itemPost").get("unitPrice"), rootOrderDetail.get("quantity"))));
         query.groupBy(builder.function("MONTH", Integer.class, rootOrder.get("createdDate")));
@@ -268,6 +270,8 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         predicates.add(p3);
         Predicate p5 = builder.equal(builder.function("YEAR", Integer.class, rootOrder.get("createdDate")), year);
         predicates.add(p5);
+        Predicate p6 = builder.notEqual(rootOrderAgency.get("orderState").get("id"), 6);
+        predicates.add(p6);
         query.where(predicates.toArray(new Predicate[]{}));
         query.multiselect(builder.function("QUARTER", Integer.class, rootOrder.get("createdDate")), builder.sum(builder.prod(rootOrderDetail.get("itemPost").get("unitPrice"), rootOrderDetail.get("quantity"))));
         query.groupBy(builder.function("QUARTER", Integer.class, rootOrder.get("createdDate")));
@@ -291,6 +295,8 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         predicates.add(p2);
         Predicate p3 = builder.equal(rootOrderDetail.get("orderAgency").get("id"), rootOrderAgency.get("id"));
         predicates.add(p3);
+        Predicate p4 = builder.notEqual(rootOrderAgency.get("orderState").get("id"), 6);
+        predicates.add(p4);
         query.where(predicates.toArray(new Predicate[]{}));
         query.multiselect(builder.function("YEAR", Integer.class, rootOrder.get("createdDate")), builder.sum(builder.prod(rootOrderDetail.get("itemPost").get("unitPrice"), rootOrderDetail.get("quantity"))));
         query.groupBy(builder.function("YEAR", Integer.class, rootOrder.get("createdDate")));

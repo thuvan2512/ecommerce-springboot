@@ -4,6 +4,7 @@ import com.thunv.ecommerceou.services.MailService;
 import com.thunv.ecommerceou.utils.ThymeleafUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.mail.Authenticator;
@@ -30,30 +31,35 @@ public class MailServiceImpl implements MailService {
 
     @Autowired
     ThymeleafUtils thymeleafUtils;
+    @Autowired
+    private Environment env;
 
     @Override
     public void sendMail(String mailTo,String subject,String title,String content,String item, String mailTemplate) {
-        Properties props = new Properties();
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", port);
-
-        Session session = Session.getInstance(props,
-                new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(email, password);
-                    }
-                });
-        Message message = new MimeMessage(session);
         try {
-            message.setRecipients(Message.RecipientType.TO, new InternetAddress[]{new InternetAddress(mailTo)});
+            String isSendMail = this.env.getProperty("config.mail.disableSendMail");
+            if (Integer.parseInt(isSendMail) == 0){
+                Properties props = new Properties();
+                props.put("mail.smtp.host", host);
+                props.put("mail.smtp.starttls.enable", "true");
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.port", port);
 
-            message.setFrom(new InternetAddress(email));
-            message.setSubject(subject);
-            message.setContent(thymeleafUtils.getContent(title,content,item,mailTemplate), CONTENT_TYPE_TEXT_HTML);
-            Transport.send(message);
+                Session session = Session.getInstance(props,
+                        new Authenticator() {
+                            @Override
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                return new PasswordAuthentication(email, password);
+                            }
+                        });
+                Message message = new MimeMessage(session);
+                message.setRecipients(Message.RecipientType.TO, new InternetAddress[]{new InternetAddress(mailTo)});
+
+                message.setFrom(new InternetAddress(email));
+                message.setSubject(subject);
+                message.setContent(thymeleafUtils.getContent(title,content,item,mailTemplate), CONTENT_TYPE_TEXT_HTML);
+                Transport.send(message);
+            }
         } catch (MessagingException e) {
             e.printStackTrace();
         }

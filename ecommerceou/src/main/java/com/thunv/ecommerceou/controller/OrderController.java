@@ -2,16 +2,14 @@ package com.thunv.ecommerceou.controller;
 
 import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.res.ModelResponse;
-import com.thunv.ecommerceou.services.AgencyService;
-import com.thunv.ecommerceou.services.OrderService;
-import com.thunv.ecommerceou.services.OrderStateService;
-import com.thunv.ecommerceou.services.UserService;
+import com.thunv.ecommerceou.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -23,6 +21,10 @@ public class OrderController {
     private AgencyService agencyService;
     @Autowired
     private OrderStateService orderStateService;
+    @Autowired
+    private OrderTrackingService orderTrackingService;
+    @Autowired
+    private MailService mailService;
     @Autowired
     private UserService userService;
 
@@ -113,8 +115,66 @@ public class OrderController {
         HttpStatus status = HttpStatus.OK;
         try {
             OrderState orderState = this.orderStateService.getOrderStateByID(Integer.parseInt(stateID));
+            if (orderState.getId() == 6){
+                throw new RuntimeException("Can not change order state to 'canceled' !!!");
+            }
             OrderAgency orderAgency = this.orderService.getOrderAgencyByID(Integer.parseInt(orderAgencyID));
+            if (orderAgency.getOrderState().getId() == 6){
+                throw new RuntimeException("This order has been canceled !!!");
+            }
             res = this.orderService.updateStateOfOrdersAgency(orderAgency,orderState);
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
+
+    @PatchMapping(value = "/orders-agency/cancel-order/{orderAgencyID}")
+    public ResponseEntity<ModelResponse> cancelOrderAgency(@PathVariable(value = "orderAgencyID") String orderAgencyID){
+        String ms;
+        String code;
+        Object res = null;
+        HttpStatus status;
+        try {
+            boolean flagCancel = false;
+            OrderAgency orderAgency = this.orderService.getOrderAgencyByID(Integer.parseInt(orderAgencyID));
+            if (orderAgency.getOrderState().getId() == 6){
+                throw new RuntimeException("Order has been canceled before !!!");
+            }
+            if (orderAgency.getOrderExpressID() != null){
+                Map<Object, Object> temp = this.orderTrackingService.cancelOrderOfGHNExpress(orderAgency.getOrderExpressID());
+                if(String.valueOf(temp.get("code")).equals("200")){
+                    flagCancel = true;
+                    User user = orderAgency.getOrders().getAuthor();
+                    ms = "Cancel order successfully !!!";
+                    String mailTo = user.getEmail();
+                    String subject = "Your order has been canceled";
+                    String title = String.format("Dear %s,", user.getUsername());
+                    String content = String.format("We have canceled child-order from agency '%s' in your order (order id = %d). Please check your orders in the order tracking section on our website.\n" +
+                            "Contact if you need support.", orderAgency.getAgency().getName(), orderAgency.getOrders().getId());
+                    String mailTemplate = "reset-password";
+                    String items = "";
+                    this.mailService.sendMail(mailTo,subject,title,content,items,mailTemplate);
+                }else {
+                    ms = temp.get("message").toString();
+                }
+            }else {
+                flagCancel = true;
+                ms = "Cancel order successfully !!!";
+            }
+            if (flagCancel == true){
+                OrderState orderState = this.orderStateService.getOrderStateByID(6);
+                this.orderService.updateStateOfOrdersAgency(orderAgency, orderState);
+                status = HttpStatus.OK;
+                code = "200";
+            }else {
+                status = HttpStatus.BAD_REQUEST;
+                code = "400";
+            }
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
