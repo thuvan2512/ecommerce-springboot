@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @CrossOrigin
@@ -156,7 +157,7 @@ public class OrderController {
                     String title = String.format("Dear %s,", user.getUsername());
                     String content = String.format("We have canceled child-order from agency '%s' in your order (order id = %d). Please check your orders in the order tracking section on our website.\n" +
                             "Contact if you need support.", orderAgency.getAgency().getName(), orderAgency.getOrders().getId());
-                    String mailTemplate = "reset-password";
+                    String mailTemplate = "mail-notify";
                     String items = "";
                     this.mailService.sendMail(mailTo,subject,title,content,items,mailTemplate);
                 }else {
@@ -167,6 +168,8 @@ public class OrderController {
                 ms = "Cancel order successfully !!!";
             }
             if (flagCancel == true){
+                List<OrderDetail> orderDetailList = this.orderService.getListOrderDetailByOrderAgency(orderAgency);
+                this.orderService.returnOldQuantityAfterCancelOrder(orderDetailList);
                 OrderState orderState = this.orderStateService.getOrderStateByID(6);
                 this.orderService.updateStateOfOrdersAgency(orderAgency, orderState);
                 status = HttpStatus.OK;

@@ -41,7 +41,7 @@ public class ConfirmCodeServiceImpl implements ConfirmCodeService {
             String title = String.format("Dear %s,", user.getUsername());
             String code = this.utils.randCodeConfirm();
             String content = String.format("Your confirmation code is %s. If confirmed, this is also your new password",code);
-            String mailTemplate = "reset-password";
+            String mailTemplate = "mail-notify";
             String items = "";
             this.mailService.sendMail(mailTo,subject,title,content,items,mailTemplate);
             confirmCode.setCode(this.utils.passwordEncoder(code));

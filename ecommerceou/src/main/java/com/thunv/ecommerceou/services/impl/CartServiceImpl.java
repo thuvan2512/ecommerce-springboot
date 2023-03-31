@@ -258,7 +258,7 @@ public class CartServiceImpl implements CartService {
                     }
                 }
                 String mailTo = user.getEmail();
-                String subject = "Thank you for shopping at OU ecommerce";
+                String subject = "Thank you for shopping at Open Market";
                 String title = String.format("Dear %s,", user.getUsername());
                 String content = "We have received your order";
                 String mailTemplate = "mail";
