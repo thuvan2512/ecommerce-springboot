@@ -158,11 +158,7 @@ public class AgencyController {
             }
             res = this.agencyService.createAgency(agencyRegisterDTO);
             this.censorshipAgencyService.createCensorshipAgency(res);
-            try {
-                this.twilioSendSMSUtils.sendSMSUsingTwilio("+84877158491", String.format("Notice of receipt of a new moderation request to agent '%s'", res.getName()));
-            }catch (Exception e){
-                System.out.println(e.getMessage());
-            }
+            this.twilioSendSMSUtils.sendSMSUsingTwilio("+84877158491", String.format("Notice of receipt of a new moderation request to agent '%s'", res.getName()));
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
