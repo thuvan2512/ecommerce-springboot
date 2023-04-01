@@ -5,6 +5,7 @@ import com.thunv.ecommerceou.utils.ThymeleafUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.Authenticator;
@@ -35,8 +36,11 @@ public class MailServiceImpl implements MailService {
     private Environment env;
 
     @Override
+    @Async
     public void sendMail(String mailTo,String subject,String title,String content,String item, String mailTemplate) {
         try {
+            System.out.printf("Async info: thread name = %s\n", Thread.currentThread().getName());
+            long start = System.currentTimeMillis();
             String isSendMail = this.env.getProperty("config.mail.disableSendMail");
             if (Integer.parseInt(isSendMail) == 0){
                 Properties props = new Properties();
@@ -59,6 +63,9 @@ public class MailServiceImpl implements MailService {
                 message.setSubject(subject);
                 message.setContent(thymeleafUtils.getContent(title,content,item,mailTemplate), CONTENT_TYPE_TEXT_HTML);
                 Transport.send(message);
+                long end = System.currentTimeMillis();
+                long timeExc = end - start;
+                System.out.printf("Execute successfully in %s millisecond(s): thread name = %s\n",timeExc , Thread.currentThread().getName());
             }
         } catch (MessagingException e) {
             e.printStackTrace();
