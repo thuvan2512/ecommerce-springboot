@@ -10,6 +10,7 @@ import com.thunv.ecommerceou.services.AgencyService;
 import com.thunv.ecommerceou.services.CensorshipAgencyService;
 import com.thunv.ecommerceou.services.CommentService;
 import com.thunv.ecommerceou.services.UserService;
+import com.thunv.ecommerceou.utils.TwilioSendSMSUtils;
 import com.thunv.ecommerceou.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -40,6 +41,8 @@ public class AgencyController {
     private Environment env;
     @Autowired
     private Utils utils;
+    @Autowired
+    private TwilioSendSMSUtils twilioSendSMSUtils;
     @GetMapping(value = "/{agencyID}")
     public ResponseEntity<ModelResponse> getAgencyByID(@PathVariable(value = "agencyID") String agencyID){
         String ms = "Get agency successfully";
@@ -155,6 +158,11 @@ public class AgencyController {
             }
             res = this.agencyService.createAgency(agencyRegisterDTO);
             this.censorshipAgencyService.createCensorshipAgency(res);
+            try {
+                this.twilioSendSMSUtils.sendSMSUsingTwilio("+84877158491", String.format("Notice of receipt of a new moderation request to agent '%s'", res.getName()));
+            }catch (Exception e){
+                System.out.println(e.getMessage());
+            }
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
