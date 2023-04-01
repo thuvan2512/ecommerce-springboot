@@ -13,7 +13,7 @@ public class TwilioSendSMSUtils {
     @Autowired
     private Environment env;
 
-    public void sendSMSUsingTwilio(String toPhone, String content) throws RuntimeException{
+    public void sendSMSUsingTwilio(String toPhone, String content){
         try {
             String accountSID = this.env.getProperty("twilio.account_sid");
             String authToken = this.env.getProperty("twilio.auth_token");
@@ -25,7 +25,6 @@ public class TwilioSendSMSUtils {
                             content).create();
         }catch (Exception ex){
             System.out.println(ex.getMessage());
-            throw new RuntimeException(ex.getMessage());
         }
     }
 }
