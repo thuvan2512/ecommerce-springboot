@@ -151,6 +151,11 @@
 			<artifactId>restfb</artifactId>
 			<version>3.24.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+			<version>7.20.0</version>
+		</dependency>
     </dependencies>
 
 	<build>

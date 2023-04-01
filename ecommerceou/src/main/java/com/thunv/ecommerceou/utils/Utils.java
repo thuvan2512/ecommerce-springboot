@@ -194,16 +194,14 @@ public class Utils {
         return null;
     }
 
-    public Boolean saveLogError(String logType, String logDetails) throws RuntimeException{
+    public void saveLogError(String logType, String logDetails) throws RuntimeException{
         try {
             ManageErrorLog manageErrorLog = new ManageErrorLog();
             manageErrorLog.setTypeLog(logType);
             manageErrorLog.setDetails(logDetails);
             this.manageErrorLogService.saveThirdPartyErrorLog(manageErrorLog);
-            return true;
         }catch (Exception exception){
             System.out.println(exception.getMessage());
         }
-        return false;
     }
 }
