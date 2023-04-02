@@ -82,6 +82,7 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
             }
         }
         predicates1.add(criteriaBuilder.equal(root.get("isActive").as(Integer.class), 1));
+        predicates1.add(criteriaBuilder.equal(root.get("agency").get("isActive").as(Integer.class), 1));
         Integer category = searchSalePostDTO.getCategoryID();
         if (category != null) {
             Predicate p6 = criteriaBuilder.equal(root.get("category").get("id").as(Integer.class), category);
