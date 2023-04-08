@@ -10,9 +10,6 @@ Ecommerce web application
 </p>
 <hr />
 </h1>
-<p align="center">This project using the authentication and authorization mechanism of Spring Security and JWT (Json Web Token) standard. Interact with the database using Hibernate ORM and Java Persistence API architecture (JPA). In addition, the project also integrates a number of third-party services such as login via google and facebook accounts, online payment via e-wallet, the shipping process of GHNExpress, send notifications via text message using Twilio,...etc
-</p>
-<hr />
 <h3>Getting started</h3>
 <br/>
 ...
