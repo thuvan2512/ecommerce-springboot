@@ -5,6 +5,7 @@ import com.thunv.ecommerceou.models.pojo.CensorshipAgency;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.res.ModelResponse;
 import com.thunv.ecommerceou.services.CensorshipAgencyService;
+import com.thunv.ecommerceou.services.NotifyService;
 import com.thunv.ecommerceou.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,8 @@ public class CensorshipAgencyController {
     private UserService userService;
     @Autowired
     private JwtTokenUtils jwtTokenUtils;
+    @Autowired
+    private NotifyService notifyService;
     @GetMapping(value = "/{censorshipID}")
     public ResponseEntity<ModelResponse> getCensorByID(@PathVariable(value = "censorshipID") String censorshipID){
         String ms = "Get censorship agency successfully";
@@ -96,6 +99,11 @@ public class CensorshipAgencyController {
             }
             CensorshipAgency censorshipAgency = this.censorshipAgencyService.getCensorshipByID(Integer.parseInt(censorshipID));
             res = this.censorshipAgencyService.censorAgency(user,censorshipAgency,false);
+            String recipient = String.format("user-%s", censorshipAgency.getManager().getId());
+            String title = "Your agency moderation request denied";
+            String detail = "Your agency moderation request denied. Please contact us for more information.";
+            String type = "Request Denied";
+            this.notifyService.pushNotify(recipient, censorshipAgency.getAgency().getAvatar(), title, detail, type);
         }catch (Exception ex){
             ms = ex.getMessage();
             if (code.equals("200")){
@@ -128,6 +136,11 @@ public class CensorshipAgencyController {
             }
             CensorshipAgency censorshipAgency = this.censorshipAgencyService.getCensorshipByID(Integer.parseInt(censorshipID));
             res = this.censorshipAgencyService.censorAgency(user,censorshipAgency,true);
+            String recipient = String.format("user-%s", censorshipAgency.getManager().getId());
+            String title = "Your agency moderation request accepted";
+            String detail = "Your agency moderation request accepted. You can go to your agent management page now !!!";
+            String type = "Request Accepted";
+            this.notifyService.pushNotify(recipient, censorshipAgency.getAgency().getAvatar(), title, detail, type);
         }catch (Exception ex){
             ms = ex.getMessage();
             if (code.equals("200")){

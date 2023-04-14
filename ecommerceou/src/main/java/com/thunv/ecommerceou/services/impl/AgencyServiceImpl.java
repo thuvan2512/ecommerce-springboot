@@ -31,6 +31,16 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    public Agency getAgencyByUserID(int userID) throws RuntimeException{
+        User user = this.userService.getUserByID(userID);
+        List<Agency> agencyList = this.agencyRepository.findByManager(user);
+        if(agencyList.size() > 0){
+            return agencyList.get(0);
+        }
+        return null;
+    }
+
+    @Override
     public List<Agency> getAllAgency()  throws RuntimeException{
         try {
             return this.agencyRepository.findAll();

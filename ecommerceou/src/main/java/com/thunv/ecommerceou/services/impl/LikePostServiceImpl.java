@@ -1,10 +1,12 @@
 package com.thunv.ecommerceou.services.impl;
 
+import com.thunv.ecommerceou.models.enumerate.NotificationImages;
 import com.thunv.ecommerceou.models.pojo.LikePost;
 import com.thunv.ecommerceou.models.pojo.SalePost;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.LikePostRepository;
 import com.thunv.ecommerceou.services.LikePostService;
+import com.thunv.ecommerceou.services.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,8 @@ import java.util.List;
 public class LikePostServiceImpl implements LikePostService {
     @Autowired
     private LikePostRepository likePostRepository;
+    @Autowired
+    private NotifyService notifyService;
     @Override
     public LikePost createLikePost(User user, SalePost salePost) throws RuntimeException{
         try {
@@ -26,6 +30,12 @@ public class LikePostServiceImpl implements LikePostService {
                 }
                 return this.likePostRepository.save(lp);
             } else {
+                String recipient = String.format("agency-%s", salePost.getAgency().getId());
+                String title = "Your sale post has new likes";
+                String detail = String.format("User %s just liked your sale post '%s'.",
+                        user.getUsername(), salePost.getTitle());
+                String type = "Interactions";
+                this.notifyService.pushNotify(recipient, user.getAvatar(), title, detail, type);
                 LikePost likePost = new LikePost();
                 likePost.setSalePost(salePost);
                 likePost.setAuthor(user);

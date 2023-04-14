@@ -5,10 +5,7 @@ import com.thunv.ecommerceou.models.pojo.CensorshipAgency;
 import com.thunv.ecommerceou.models.pojo.Role;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.CensorshipAgencyRepository;
-import com.thunv.ecommerceou.services.AgencyService;
-import com.thunv.ecommerceou.services.CensorshipAgencyService;
-import com.thunv.ecommerceou.services.RoleService;
-import com.thunv.ecommerceou.services.UserService;
+import com.thunv.ecommerceou.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +22,8 @@ public class CensorshipAgencyServiceImpl implements CensorshipAgencyService {
     private UserService userService;
     @Autowired
     private AgencyService agencyService;
+    @Autowired
+    private NotifyService notifyService;
     @Override
     public CensorshipAgency createCensorshipAgency(Agency agency)  throws RuntimeException{
         try {
@@ -32,6 +31,12 @@ public class CensorshipAgencyServiceImpl implements CensorshipAgencyService {
             censorshipAgency.setAgency(agency);
             censorshipAgency.setManager(agency.getManager());
             censorshipAgency.setCreatedDate(new Date());
+            String recipient = "admin";
+            String title = "There is 01 new partner agency moderation request";
+            String detail = String.format("User %s's %s agent just submitted a new agent moderation request.",
+                    agency.getManager().getUsername(), agency.getName());
+            String type = "Censorship Partner Agency";
+            this.notifyService.pushNotify(recipient, agency.getAvatar(), title, detail, type);
             return this.censorshipAgencyRepository.save(censorshipAgency);
         }catch (Exception ex){
             String error_ms = ex.getMessage();

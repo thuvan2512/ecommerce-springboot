@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface AgencyService {
     Agency getAgencyByID(int agencyID);
+    Agency getAgencyByUserID(int userID);
     List<Agency> getAllAgency();
     List<Object[]> getTopAgency(int top);
     List<Agency> searchAgency(SearchAgencyDTO searchAgencyDTO);
