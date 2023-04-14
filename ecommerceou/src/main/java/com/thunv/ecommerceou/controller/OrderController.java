@@ -1,5 +1,6 @@
 package com.thunv.ecommerceou.controller;
 
+import com.thunv.ecommerceou.models.enumerate.NotificationImages;
 import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.res.ModelResponse;
 import com.thunv.ecommerceou.services.*;
@@ -28,6 +29,9 @@ public class OrderController {
     private MailService mailService;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private NotifyService notifyService;
 
     @GetMapping(value = "/orders-agency/agency/{agencyID}")
     public ResponseEntity<ModelResponse> getOrderAgencyOfAgency(@PathVariable(value = "agencyID") String agencyID){
@@ -124,6 +128,13 @@ public class OrderController {
                 throw new RuntimeException("This order has been canceled !!!");
             }
             res = this.orderService.updateStateOfOrdersAgency(orderAgency,orderState);
+
+            String recipient = String.format("user-%s", orderAgency.getOrders().getAuthor().getId());
+            String title = "Your order has been updated by the seller";
+            String detail = String.format("Your order has been updated to '%s' status by the seller",
+                    orderState.getName());
+            String type = "Order Tracking";
+            this.notifyService.pushNotify(recipient, NotificationImages.ORDER_TRACKING.getValue(), title, detail, type);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
@@ -174,6 +185,12 @@ public class OrderController {
                 this.orderService.updateStateOfOrdersAgency(orderAgency, orderState);
                 status = HttpStatus.OK;
                 code = "200";
+
+                String recipient = String.format("user-%s", orderAgency.getOrders().getAuthor().getId());
+                String title = "Your order has been canceled by the seller";
+                String detail = "Your order has been updated to 'canceled' status by the seller";
+                String type = "Canceled Order";
+                this.notifyService.pushNotify(recipient, NotificationImages.ORDER_TRACKING.getValue(), title, detail, type);
             }else {
                 status = HttpStatus.BAD_REQUEST;
                 code = "400";

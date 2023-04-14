@@ -1,5 +1,6 @@
 package com.thunv.ecommerceou.services.impl;
 
+import com.thunv.ecommerceou.models.enumerate.NotificationImages;
 import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.repositories.*;
 import com.thunv.ecommerceou.services.*;
@@ -39,6 +40,8 @@ public class CartServiceImpl implements CartService {
     private MomoPaymentUtils momoPaymentUtils;
     @Autowired
     private OrderTrackingService orderTrackingService;
+    @Autowired
+    private NotifyService notifyService;
     @Override
     public List<CartItem> addToCart(User user, ItemPost itemPost, int quantity) throws RuntimeException{
         try {
@@ -205,6 +208,7 @@ public class CartServiceImpl implements CartService {
                         totalPrice += cartItem.getQuantity() * cartItem.getItemPost().getUnitPrice();
                     }
                     orderAgency.setTotalPrice(totalPrice);
+                    String orderCode = "Undefined";
                     try {
                         Integer payShipType;
                         Integer amountCOD;
@@ -229,7 +233,8 @@ public class CartServiceImpl implements CartService {
                         if (String.valueOf(createOrder.get("code")).equals("200")){
                             Map<Object, Object> createOrderTemp= (Map<Object,Object>) createOrder.get("data");
                             System.out.println(createOrderTemp.toString());
-                            orderAgency.setOrderExpressID(createOrderTemp.get("order_code").toString());
+                            orderCode = createOrderTemp.get("order_code").toString();
+                            orderAgency.setOrderExpressID(orderCode);
                             orderAgency.setShipFee(Double.parseDouble(createOrderTemp.get("total_fee").toString()));
                             shipFee += Double.parseDouble(createOrderTemp.get("total_fee").toString());
                             orderAgency.setExpectedDeliveryTime(createOrderTemp.get("expected_delivery_time").toString());
@@ -245,6 +250,14 @@ public class CartServiceImpl implements CartService {
                     }catch (Exception exception){
                         System.out.println(exception.getMessage());
                     }
+
+                    String recipient = String.format("agency-%s", orderAgency.getAgency().getId());
+                    String title = "You have 01 new order";
+                    String detail = String.format("The order with the bill of lading code %s has just been created on the system.",
+                            orderCode);
+                    String type = "Order Processing";
+                    this.notifyService.pushNotify(recipient, NotificationImages.ORDER_TRACKING.getValue(), title, detail, type);
+
                     this.ordersAgencyRepository.save(orderAgency);
                     for (CartItem cartItem: v.getValue()){
                         OrderDetail orderDetail = new OrderDetail();
@@ -257,6 +270,7 @@ public class CartServiceImpl implements CartService {
                         this.itemRepository.save(cartItem.getItemPost());
                     }
                 }
+
                 String mailTo = user.getEmail();
                 String subject = "Thank you for shopping at Open Market";
                 String title = String.format("Dear %s,", user.getUsername());

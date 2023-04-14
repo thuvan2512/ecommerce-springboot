@@ -1,7 +1,9 @@
 package com.thunv.ecommerceou.utils;
 
+import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.CartItem;
 import com.thunv.ecommerceou.models.pojo.ManageErrorLog;
+import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.services.CartService;
 import com.thunv.ecommerceou.services.ManageErrorLogService;
 import org.apache.commons.codec.digest.HmacUtils;
@@ -203,5 +205,13 @@ public class Utils {
         }catch (Exception exception){
             System.out.println(exception.getMessage());
         }
+    }
+
+    public String getCollectionNameOfUser(User user){
+        return String.format("user-%s", user.getId());
+    }
+
+    public String getCollectionNameOfAgency(Agency agency){
+        return String.format("agency-%s", agency.getId());
     }
 }

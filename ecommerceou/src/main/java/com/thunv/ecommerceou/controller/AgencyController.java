@@ -1,15 +1,13 @@
 package com.thunv.ecommerceou.controller;
 
 import com.thunv.ecommerceou.dto.*;
+import com.thunv.ecommerceou.models.enumerate.NotificationImages;
 import com.thunv.ecommerceou.models.pojo.SalePost;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.res.ModelResponse;
 import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.res.SearchResponse;
-import com.thunv.ecommerceou.services.AgencyService;
-import com.thunv.ecommerceou.services.CensorshipAgencyService;
-import com.thunv.ecommerceou.services.CommentService;
-import com.thunv.ecommerceou.services.UserService;
+import com.thunv.ecommerceou.services.*;
 import com.thunv.ecommerceou.utils.TwilioSendSMSUtils;
 import com.thunv.ecommerceou.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +41,8 @@ public class AgencyController {
     private Utils utils;
     @Autowired
     private TwilioSendSMSUtils twilioSendSMSUtils;
+    @Autowired
+    private NotifyService notifyService;
     @GetMapping(value = "/{agencyID}")
     public ResponseEntity<ModelResponse> getAgencyByID(@PathVariable(value = "agencyID") String agencyID){
         String ms = "Get agency successfully";
@@ -60,6 +60,25 @@ public class AgencyController {
                 new ModelResponse(code,ms,agency)
         );
     }
+
+    @GetMapping(value = "/get-agency-by-user-id{userID}")
+    public ResponseEntity<ModelResponse> getAgencyByUserID(@PathVariable(value = "userID") String userID){
+        String ms = "Get agency by user id successfully";
+        String code = "200";
+        Agency agency = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            agency = this.agencyService.getAgencyByUserID(Integer.parseInt(userID));
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,agency)
+        );
+    }
+
     @GetMapping(value = "/all")
     public ResponseEntity<ModelResponse> getAllAgency(){
         String ms = "Get all agency successfully";
@@ -218,6 +237,11 @@ public class AgencyController {
         Agency res = null;
         try {
             res = this.agencyService.banAgency(Integer.parseInt(agencyID));
+            String recipient = String.format("agency-%s", agencyID);
+            String title = "Your agent has been banned";
+            String detail = "Your agent has been banned, please contact the administrator.";
+            String type = "Has Been Banned";
+            this.notifyService.pushNotify(recipient, NotificationImages.AGENCY_MANAGE.getValue(), title, detail, type);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
@@ -233,6 +257,11 @@ public class AgencyController {
         Agency res = null;
         try {
             res = this.agencyService.unBanAgency(Integer.parseInt(agencyID));
+            String recipient = String.format("agency-%s", agencyID);
+            String title = "Your agent has been unbanned";
+            String detail = "Your agent has been unbanned.";
+            String type = "Has Been Unbanned";
+            this.notifyService.pushNotify(recipient, NotificationImages.AGENCY_MANAGE.getValue(), title, detail, type);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
