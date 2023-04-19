@@ -61,7 +61,7 @@ public class AgencyController {
         );
     }
 
-    @GetMapping(value = "/get-agency-by-user-id{userID}")
+    @GetMapping(value = "/get-agency-by-user-id/{userID}")
     public ResponseEntity<ModelResponse> getAgencyByUserID(@PathVariable(value = "userID") String userID){
         String ms = "Get agency by user id successfully";
         String code = "200";
