@@ -2,6 +2,7 @@ package com.thunv.ecommerceou.repositories.impl;
 
 import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.FollowAgency;
+import com.thunv.ecommerceou.models.pojo.LikePost;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.custom.FollowRepositoryCustom;
 import org.hibernate.Session;
@@ -72,5 +73,17 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
             e.printStackTrace();
         }
         return followAgency;
+    }
+
+    @Override
+    public int countFollowByPost(Agency agency) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Integer> query = builder.createQuery(Integer.class);
+        Root root = query.from(FollowAgency.class);
+        query.select(builder.count(root.get("agency")).as(Integer.class));
+        query.where(builder.equal(root.get("agency").get("id"), agency.getId()));
+        Query q = session.createQuery(query);
+        return (int) q.getSingleResult();
     }
 }

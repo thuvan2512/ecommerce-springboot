@@ -7,4 +7,6 @@ import com.thunv.ecommerceou.models.pojo.User;
 public interface FollowService {
     FollowAgency createFollow(User user, Agency agency);
     boolean getFollowStateAgencyByUser(User user, Agency agency);
+
+    int countFollowByAgency(Agency agency);
 }

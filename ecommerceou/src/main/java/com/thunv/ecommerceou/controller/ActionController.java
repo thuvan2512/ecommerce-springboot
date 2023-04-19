@@ -114,6 +114,26 @@ public class ActionController {
                 new ModelResponse(code, ms,state)
         );
     }
+
+    @GetMapping(value = "/follow/count-follow-by-agency/{agencyID}")
+    public ResponseEntity<ModelResponse> countFollowByAgency(@PathVariable(value = "agencyID") String agencyID){
+        String ms = "Get num of follow by agency successfully";
+        String code = "200";
+        Integer countFollow = 0;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
+            countFollow = this.followService.countFollowByAgency(agency);
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,countFollow)
+        );
+    }
+
     @GetMapping(value = "/follow/{agencyID}")
     public ResponseEntity<ModelResponse> followAgencyAction(@PathVariable(value = "agencyID") String agencyID,
                                                         HttpServletRequest request) {
