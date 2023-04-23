@@ -241,7 +241,7 @@ public class AgencyController {
             String title = "Your agent has been banned";
             String detail = "Your agent has been banned, please contact the administrator.";
             String type = "Has Been Banned";
-            this.notifyService.pushNotify(recipient, NotificationImages.AGENCY_MANAGE.getValue(), title, detail, type);
+            this.notifyService.pushNotify(recipient, NotificationImages.BAN_AGENCY.getValue(), title, detail, type);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
@@ -261,7 +261,7 @@ public class AgencyController {
             String title = "Your agent has been unbanned";
             String detail = "Your agent has been unbanned.";
             String type = "Has Been Unbanned";
-            this.notifyService.pushNotify(recipient, NotificationImages.AGENCY_MANAGE.getValue(), title, detail, type);
+            this.notifyService.pushNotify(recipient, NotificationImages.UNBAN_AGENCY.getValue(), title, detail, type);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";

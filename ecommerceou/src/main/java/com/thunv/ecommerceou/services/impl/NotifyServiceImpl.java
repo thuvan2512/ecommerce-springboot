@@ -4,6 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.thunv.ecommerceou.models.NotificationEntity;
+import com.thunv.ecommerceou.models.pojo.FollowAgency;
 import com.thunv.ecommerceou.services.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -18,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 public class NotifyServiceImpl implements NotifyService {
     @Override
     @Async
-    public String pushNotify(String recipientID, String image, String title, String details, String type) throws RuntimeException {
+    public void pushNotify(String recipientID, String image, String title, String details, String type) throws RuntimeException {
         try {
             NotificationEntity notificationEntity = new NotificationEntity();
             notificationEntity.setTitle(title);
@@ -28,13 +29,25 @@ public class NotifyServiceImpl implements NotifyService {
             Firestore fireStore = FirestoreClient.getFirestore();
             ApiFuture<WriteResult> collectionApiFuture = fireStore.collection(recipientID)
                     .document(UUID.randomUUID().toString()).set(notificationEntity);
-            return collectionApiFuture.get().getUpdateTime().toString();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        }
+    }
+
+    @Override
+    @Async
+    public void pushListFollowNotifyForUser(List<FollowAgency> followAgencyList, String titlePost) {
+        try {
+            for (FollowAgency followAgency: followAgencyList){
+                String recipient = String.format("user-%s", followAgency.getAuthor().getId());
+                String title = "The agent you follow is about to post a new sale post";
+                String detail = String.format("Agent '%s' is about to have a new sale post with title '%s'.",
+                        followAgency.getAgency().getName(), titlePost);
+                String type = "New Sale Post";
+                this.pushNotify(recipient, followAgency.getAgency().getAvatar(), title, detail, type);
+            }
+        } catch (Exception e) {
             System.out.println(e.getMessage());
-            throw new RuntimeException(e);
         }
     }
 

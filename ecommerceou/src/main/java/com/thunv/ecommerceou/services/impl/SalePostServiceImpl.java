@@ -3,15 +3,9 @@ package com.thunv.ecommerceou.services.impl;
 import com.thunv.ecommerceou.dto.SalePostCreateDTO;
 import com.thunv.ecommerceou.dto.SalePostUpdateDTO;
 import com.thunv.ecommerceou.dto.SearchSalePostDTO;
-import com.thunv.ecommerceou.models.pojo.Agency;
-import com.thunv.ecommerceou.models.pojo.CommentPost;
-import com.thunv.ecommerceou.models.pojo.SalePost;
-import com.thunv.ecommerceou.models.pojo.User;
+import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.repositories.SalePostRepository;
-import com.thunv.ecommerceou.services.CategoryService;
-import com.thunv.ecommerceou.services.CommentService;
-import com.thunv.ecommerceou.services.SalePostService;
-import com.thunv.ecommerceou.services.SellStatusService;
+import com.thunv.ecommerceou.services.*;
 import com.thunv.ecommerceou.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -34,6 +28,10 @@ public class SalePostServiceImpl implements SalePostService {
     private CommentService commentService;
     @Autowired
     private Utils utils;
+    @Autowired
+    private FollowService followService;
+    @Autowired
+    private NotifyService notifyService;
 
     @Override
     public SalePost getSalePostByID(int postID) throws RuntimeException {
@@ -144,6 +142,8 @@ public class SalePostServiceImpl implements SalePostService {
             salePost.setCategory(this.categoryService.getCategoryByID(salePostCreateDTO.getCategoryID()));
             salePost.setSellStatus(this.sellStatusService.getSellStatusByID(salePostCreateDTO.getSellStatusID()));
             salePost.setAgency(salePostCreateDTO.getAgency());
+            List<FollowAgency> followAgencyList = this.followService.getListFollowByAgency(salePostCreateDTO.getAgency());
+            this.notifyService.pushListFollowNotifyForUser(followAgencyList, salePost.getTitle());
             return this.salePostRepository.save(salePost);
         } catch (Exception ex) {
             String error_ms = ex.getMessage();
