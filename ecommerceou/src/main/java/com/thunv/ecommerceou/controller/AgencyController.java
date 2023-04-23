@@ -151,9 +151,18 @@ public class AgencyController {
             code = "400";
             status = HttpStatus.BAD_REQUEST;
         }
-        SearchResponse searchResponse = new SearchResponse(this.agencyService.getTotalPageAgency(),
+        Integer total;
+        Integer totalPage;
+        if (searchAgencyDTO.getIsAll() != 1){
+            total = list.size();
+            totalPage = this.agencyService.getTotalPageAgency(total);
+        }else {
+            total = this.agencyService.countAgency();
+            totalPage = this.agencyService.getTotalPageAgency(total);
+        }
+        SearchResponse searchResponse = new SearchResponse(totalPage,
                 Integer.parseInt(this.env.getProperty("page.size")),
-                this.agencyService.countAgency(),
+                total,
                 searchAgencyDTO.getPage(),list.size(), Arrays.asList(list.toArray()));
         return ResponseEntity.status(status).body(
                 new ModelResponse(code,ms,searchResponse)

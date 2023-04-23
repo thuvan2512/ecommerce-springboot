@@ -29,5 +29,7 @@ public class SearchSalePostDTO {
     private String fromDate;
     @Getter @Setter
     private String toDate;
+    @Getter @Setter
+    Integer isAll = 1;
 
 }
