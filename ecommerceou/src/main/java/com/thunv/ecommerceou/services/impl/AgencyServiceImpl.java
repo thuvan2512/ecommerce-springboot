@@ -5,6 +5,7 @@ import com.thunv.ecommerceou.dto.SearchAgencyDTO;
 import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.AgencyRepository;
+import com.thunv.ecommerceou.repositories.specifications.AgencySpecification;
 import com.thunv.ecommerceou.services.AgencyFieldService;
 import com.thunv.ecommerceou.services.AgencyService;
 import com.thunv.ecommerceou.services.UserService;
@@ -25,6 +26,8 @@ public class AgencyServiceImpl implements AgencyService {
     private UserService userService;
     @Autowired
     private AgencyFieldService agencyFieldService;
+    @Autowired
+    private AgencySpecification agencySpecification;
     @Override
     public Agency getAgencyByID(int agencyID) throws RuntimeException{
         return this.agencyRepository.findById(agencyID).orElseThrow(() -> new RuntimeException("Can not find agency with id = " + agencyID));
@@ -82,16 +85,15 @@ public class AgencyServiceImpl implements AgencyService {
 
     @Override
     public Integer countAgency() {
-        return Math.toIntExact(this.agencyRepository.count());
+        return Math.toIntExact(this.agencyRepository.count(this.agencySpecification.agencyValidToPublic()));
     }
 
     @Override
-    public Integer getTotalPageAgency() {
+    public Integer getTotalPageAgency(Integer total) {
         int size = Integer.parseInt(this.env.getProperty("page.size"));
-        int count = this.countAgency();
         int result;
-        if (size > 0 && count > 0) {
-            result = (int)Math.round((double)(((count*1.0 / size*1.0) + 0.499999)));
+        if (size > 0 && total > 0) {
+            result = (int)Math.round((double)(((total*1.0 / size*1.0) + 0.499999)));
         }else{
             result = 1;
         }

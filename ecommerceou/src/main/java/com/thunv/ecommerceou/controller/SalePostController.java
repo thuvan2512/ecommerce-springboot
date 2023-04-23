@@ -320,9 +320,18 @@ public class SalePostController {
             code = "400";
             status = HttpStatus.BAD_REQUEST;
         }
-        SearchResponse searchResponse = new SearchResponse(this.salePostService.getTotalPageSalePost(),
+        Integer total;
+        Integer totalPage;
+        if (searchSalePostDTO.getIsAll() != 1){
+            total = list.size();
+            totalPage = this.salePostService.getTotalPageSalePost(total);
+        }else {
+            total = this.salePostService.countSalePost();
+            totalPage = this.salePostService.getTotalPageSalePost(total);
+        }
+        SearchResponse searchResponse = new SearchResponse(totalPage,
                 Integer.parseInt(this.env.getProperty("post.paginate.size")),
-                this.salePostService.countSalePost(),
+                total,
                 searchSalePostDTO.getPage(),list.size(), Arrays.asList(list.toArray()));
         return ResponseEntity.status(status).body(
                 new ModelResponse(code,ms,searchResponse)

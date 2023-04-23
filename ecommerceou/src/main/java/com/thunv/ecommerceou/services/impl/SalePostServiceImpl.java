@@ -5,6 +5,7 @@ import com.thunv.ecommerceou.dto.SalePostUpdateDTO;
 import com.thunv.ecommerceou.dto.SearchSalePostDTO;
 import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.repositories.SalePostRepository;
+import com.thunv.ecommerceou.repositories.specifications.SalePostSpecification;
 import com.thunv.ecommerceou.services.*;
 import com.thunv.ecommerceou.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class SalePostServiceImpl implements SalePostService {
     private FollowService followService;
     @Autowired
     private NotifyService notifyService;
+    @Autowired
+    private SalePostSpecification salePostSpecification;
 
     @Override
     public SalePost getSalePostByID(int postID) throws RuntimeException {
@@ -188,7 +191,7 @@ public class SalePostServiceImpl implements SalePostService {
     @Override
     public Integer countSalePost() throws RuntimeException {
         try {
-            return Math.toIntExact(this.salePostRepository.count());
+            return Math.toIntExact(this.salePostRepository.count(this.salePostSpecification.salePostValidToPublish()));
         } catch (Exception ex) {
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);
@@ -219,12 +222,11 @@ public class SalePostServiceImpl implements SalePostService {
     }
 
     @Override
-    public Integer getTotalPageSalePost() throws RuntimeException {
+    public Integer getTotalPageSalePost(Integer total) throws RuntimeException {
         int size = Integer.parseInt(this.env.getProperty("post.paginate.size"));
-        int count = this.countSalePost();
         int result;
-        if (size > 0 && count > 0) {
-            result = (int) Math.round((double) (((count * 1.0 / size * 1.0) + 0.499999)));
+        if (size > 0 && total > 0) {
+            result = (int) Math.round((double) (((total * 1.0 / size * 1.0) + 0.499999)));
         } else {
             result = 1;
         }

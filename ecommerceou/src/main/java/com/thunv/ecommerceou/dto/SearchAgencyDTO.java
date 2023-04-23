@@ -12,4 +12,6 @@ public class SearchAgencyDTO {
     private int page = 0;
     @Getter @Setter
     private String kw;
+    @Getter @Setter
+    Integer isAll = 1;
 }

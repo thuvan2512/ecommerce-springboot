@@ -16,7 +16,7 @@ public interface AgencyService {
     List<Agency> searchAgency(SearchAgencyDTO searchAgencyDTO);
     List<Agency> getListAgencyFollowByUser(User user);
     Integer countAgency();
-    Integer getTotalPageAgency();
+    Integer getTotalPageAgency(Integer total);
     Agency createAgency(AgencyRegisterDTO agencyRegisterDTO);
     Agency updateAgency(Agency agency);
     Agency banAgency(int agencyID);
