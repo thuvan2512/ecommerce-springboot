@@ -153,13 +153,8 @@ public class AgencyController {
         }
         Integer total;
         Integer totalPage;
-        if (searchAgencyDTO.getIsAll() != 1){
-            total = list.size();
-            totalPage = this.agencyService.getTotalPageAgency(total);
-        }else {
-            total = this.agencyService.countAgency();
-            totalPage = this.agencyService.getTotalPageAgency(total);
-        }
+        total = this.agencyService.countAgency();
+        totalPage = this.agencyService.getTotalPageAgency(total);
         SearchResponse searchResponse = new SearchResponse(totalPage,
                 Integer.parseInt(this.env.getProperty("page.size")),
                 total,

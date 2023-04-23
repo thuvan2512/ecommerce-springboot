@@ -322,13 +322,8 @@ public class SalePostController {
         }
         Integer total;
         Integer totalPage;
-        if (searchSalePostDTO.getIsAll() != 1){
-            total = list.size();
-            totalPage = this.salePostService.getTotalPageSalePost(total);
-        }else {
-            total = this.salePostService.countSalePost();
-            totalPage = this.salePostService.getTotalPageSalePost(total);
-        }
+        total = this.salePostService.countSalePost();
+        totalPage = this.salePostService.getTotalPageSalePost(total);
         SearchResponse searchResponse = new SearchResponse(totalPage,
                 Integer.parseInt(this.env.getProperty("post.paginate.size")),
                 total,
