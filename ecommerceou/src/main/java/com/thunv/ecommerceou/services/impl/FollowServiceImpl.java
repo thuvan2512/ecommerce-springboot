@@ -4,14 +4,23 @@ import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.FollowAgency;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.FollowRepository;
+import com.thunv.ecommerceou.repositories.specifications.FollowSpecification;
 import com.thunv.ecommerceou.services.FollowService;
+import com.thunv.ecommerceou.services.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class FollowServiceImpl implements FollowService {
     @Autowired
     private FollowRepository followRepository;
+    @Autowired
+    private NotifyService notifyService;
+    @Autowired
+    private FollowSpecification followSpecification;
     @Override
     public FollowAgency createFollow(User user, Agency agency) throws RuntimeException{
         try {
@@ -24,6 +33,13 @@ public class FollowServiceImpl implements FollowService {
                 }
                 return this.followRepository.save(lp);
             } else {
+                String recipient = String.format("agency-%s", agency.getId());
+                String title = "Your agency has new follower";
+                String detail = String.format("User %s just followed your agency.",
+                        user.getUsername());
+                String type = "Follow";
+                this.notifyService.pushNotify(recipient, user.getAvatar(), title, detail, type);
+
                 FollowAgency fl = new FollowAgency();
                 fl.setAgency(agency);
                 fl.setAuthor(user);
@@ -52,6 +68,26 @@ public class FollowServiceImpl implements FollowService {
     public int countFollowByAgency(Agency agency) throws RuntimeException{
         try {
             return this.followRepository.countFollowByPost(agency);
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
+    public List<FollowAgency> getListFollowByUser(User user) throws RuntimeException{
+        try {
+            return this.followRepository.findAll(this.followSpecification.getFollowHasValidStateByUser(user));
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
+    public List<FollowAgency> getListFollowByAgency(Agency agency) throws RuntimeException{
+        try {
+            return this.followRepository.findAll(this.followSpecification.getFollowHasValidStateByAgency(agency));
         }catch (Exception ex){
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);
