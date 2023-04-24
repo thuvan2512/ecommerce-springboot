@@ -1,4 +1,4 @@
-package com.thunv.ecommerceou.repositories.specifications;
+package com.thunv.ecommerceou.specifications;
 
 import com.thunv.ecommerceou.models.pojo.SalePost;
 import com.thunv.ecommerceou.models.pojo.User;
