@@ -1,11 +1,10 @@
 package com.thunv.ecommerceou.services.impl;
 
 import com.thunv.ecommerceou.dto.SalePostCreateDTO;
-import com.thunv.ecommerceou.dto.SalePostUpdateDTO;
 import com.thunv.ecommerceou.dto.SearchSalePostDTO;
 import com.thunv.ecommerceou.models.pojo.*;
 import com.thunv.ecommerceou.repositories.SalePostRepository;
-import com.thunv.ecommerceou.repositories.specifications.SalePostSpecification;
+import com.thunv.ecommerceou.specifications.SalePostSpecification;
 import com.thunv.ecommerceou.services.*;
 import com.thunv.ecommerceou.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,11 +4,10 @@ import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.FollowAgency;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.FollowRepository;
-import com.thunv.ecommerceou.repositories.specifications.FollowSpecification;
+import com.thunv.ecommerceou.specifications.FollowSpecification;
 import com.thunv.ecommerceou.services.FollowService;
 import com.thunv.ecommerceou.services.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

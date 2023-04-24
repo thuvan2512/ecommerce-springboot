@@ -5,7 +5,7 @@ import com.thunv.ecommerceou.dto.SearchAgencyDTO;
 import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.AgencyRepository;
-import com.thunv.ecommerceou.repositories.specifications.AgencySpecification;
+import com.thunv.ecommerceou.specifications.AgencySpecification;
 import com.thunv.ecommerceou.services.AgencyFieldService;
 import com.thunv.ecommerceou.services.AgencyService;
 import com.thunv.ecommerceou.services.UserService;
