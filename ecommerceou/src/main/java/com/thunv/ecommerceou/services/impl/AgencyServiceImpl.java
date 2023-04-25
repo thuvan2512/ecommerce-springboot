@@ -46,7 +46,7 @@ public class AgencyServiceImpl implements AgencyService {
     @Override
     public List<Agency> getAllAgency()  throws RuntimeException{
         try {
-            return this.agencyRepository.findAll();
+            return this.agencyRepository.findAll(this.agencySpecification.agencyIsCensored());
         }catch (Exception ex){
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);
