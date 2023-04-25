@@ -4,6 +4,8 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.thunv.ecommerceou.models.NotificationEntity;
+import com.thunv.ecommerceou.models.enumerate.NotificationImages;
+import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.FollowAgency;
 import com.thunv.ecommerceou.services.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,38 @@ public class NotifyServiceImpl implements NotifyService {
                         followAgency.getAgency().getName(), titlePost);
                 String type = "New Sale Post";
                 this.pushNotify(recipient, followAgency.getAgency().getAvatar(), title, detail, type);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
+    public void pushListBanAgencyNotifyForManager(List<Agency> agencyList) {
+        try {
+            for (Agency agency: agencyList){
+                String recipient = String.format("agency-%s", agency.getId());
+                String title = "Your agent has been deactivated";
+                String detail = "Your agent has been deactivated for not renewing the package.";
+                String type = "Deactivated";
+                this.pushNotify(recipient, NotificationImages.BAN_AGENCY.getValue(), title, detail, type);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
+    public void pushListNotifyRemindAgency(List<Agency> agencyList) {
+        try {
+            for (Agency agency: agencyList){
+                String recipient = String.format("agency-%s", agency.getId());
+                String title = "Your agent is about to be disabled";
+                String detail = "Your agent is about to be disabled due to not renewing the package";
+                String type = "Remind renewal package";
+                this.pushNotify(recipient, NotificationImages.BAN_AGENCY.getValue(), title, detail, type);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

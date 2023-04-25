@@ -109,6 +109,11 @@ public class Agency {
     @JsonIgnore
     @Getter @Setter
     private Set<OrderAgency> orderAgencySet;
+
+    @OneToMany(mappedBy = "agency",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    @Getter @Setter
+    private Set<RenewalManage> renewalManageSet;
     public Agency() {
 
     }

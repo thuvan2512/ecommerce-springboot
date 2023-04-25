@@ -4,6 +4,8 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.storage.v2.Object;
+import com.thunv.schedule.TaskSchedule;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -11,7 +13,12 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
+
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
+
+import javax.annotation.PostConstruct;
 
 
 @SpringBootApplication(exclude = HibernateJpaAutoConfiguration.class)
@@ -25,7 +32,20 @@ import org.springframework.context.annotation.ComponentScan;
 //		"com.thunv.ecommerceou.utils",
 //		"com.thunv.ecommerceou.validator"
 //})
-public class EcommerceouApplication {
+public class EcommerceouApplication  {
+	@Autowired
+	private TaskSchedule taskSchedule;
+	@PostConstruct
+	public void executeScheduleTask() {
+		Timer timer = new Timer();
+		TimerTask timerTask1 = new TimerTask() {
+			@Override
+			public void run() {
+				taskSchedule.scanAndBanExpiredAgent();
+			};
+		};
+		timer.schedule(timerTask1, 0,60000);
+	}
 	public static void main(String[] args) {
 		try {
 			ClassLoader classLoader = EcommerceouApplication.class.getClassLoader();
@@ -41,15 +61,6 @@ public class EcommerceouApplication {
 			ex.printStackTrace();
 			System.out.println(ex.getMessage());
 		}
-//		System.out.println("abc");
-//		Timer t = new Timer();
-//		TimerTask tt = new TimerTask() {
-//			@Override
-//			public void run() {
-//				System.out.println("Task is on");
-//			};
-//		};
-//		t.schedule(tt, 0,3000);
 		SpringApplication.run(EcommerceouApplication.class, args);
 	}
 }

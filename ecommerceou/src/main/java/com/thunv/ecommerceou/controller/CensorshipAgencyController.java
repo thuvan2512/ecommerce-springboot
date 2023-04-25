@@ -6,6 +6,7 @@ import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.res.ModelResponse;
 import com.thunv.ecommerceou.services.CensorshipAgencyService;
 import com.thunv.ecommerceou.services.NotifyService;
+import com.thunv.ecommerceou.services.RenewalService;
 import com.thunv.ecommerceou.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,8 @@ public class CensorshipAgencyController {
     private JwtTokenUtils jwtTokenUtils;
     @Autowired
     private NotifyService notifyService;
+    @Autowired
+    private RenewalService renewalService;
     @GetMapping(value = "/{censorshipID}")
     public ResponseEntity<ModelResponse> getCensorByID(@PathVariable(value = "censorshipID") String censorshipID){
         String ms = "Get censorship agency successfully";
@@ -136,6 +139,12 @@ public class CensorshipAgencyController {
             }
             CensorshipAgency censorshipAgency = this.censorshipAgencyService.getCensorshipByID(Integer.parseInt(censorshipID));
             res = this.censorshipAgencyService.censorAgency(user,censorshipAgency,true);
+            this.renewalService.initialTrialForNewAgency(censorshipAgency.getAgency().getId());
+            String recipientAgency = String.format("agency-%s", censorshipAgency.getAgency().getId());
+            String titleAgency = "You have received the trial package";
+            String detailAgency = "You have received the trial package. You can go to your agent management page now !!!";
+            String typeAgency = "Receive trial package";
+            this.notifyService.pushNotify(recipientAgency, censorshipAgency.getAgency().getAvatar(), titleAgency, detailAgency, typeAgency);
             String recipient = String.format("user-%s", censorshipAgency.getManager().getId());
             String title = "Your agency moderation request accepted";
             String detail = "Your agency moderation request accepted. You can go to your agent management page now !!!";
