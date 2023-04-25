@@ -145,7 +145,9 @@ public class RenewalServiceImpl implements RenewalService {
                 }
                 this.renewalManageRepository.save(renewalManage);
             }else {
-                initialTrialForNewAgency(agency.getId());
+                if (agency.getIsCensored() != 0){
+                    initialTrialForNewAgency(agency.getId());
+                }
             }
         }
         this.notifyService.pushListBanAgencyNotifyForManager(banAgency);
