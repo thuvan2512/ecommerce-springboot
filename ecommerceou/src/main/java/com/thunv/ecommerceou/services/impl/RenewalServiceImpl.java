@@ -107,7 +107,9 @@ public class RenewalServiceImpl implements RenewalService {
             calendar.add(Calendar.DATE, renewalPackage.getNumberOfDaysAvailable());
             renewalManage.setExpireDate(calendar.getTime());
             Agency agency = renewalManage.getAgency();
-            agency.setIsActive(1);
+            if (agency.getDeactivatedByAdmin() == 0){
+                agency.setIsActive(1);
+            }
             this.agencyService.updateAgency(agency);
             this.renewalManageRepository.save(renewalManage);
         }
@@ -124,7 +126,7 @@ public class RenewalServiceImpl implements RenewalService {
             RenewalManage renewalManage = this.getRenewalManageByAgencyID(agency.getId());
             if (renewalManage != null){
                 if (currentDate.after(renewalManage.getExpireDate())){
-                    this.agencyService.banAgency(agency.getId());
+                    this.agencyService.banAgency(agency.getId(), false);
                     if (renewalManage.getIsDeactivate() == 0){
                         renewalManage.setIsDeactivate(1);
                         banAgency.add(agency);

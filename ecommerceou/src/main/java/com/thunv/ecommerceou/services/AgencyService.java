@@ -19,7 +19,7 @@ public interface AgencyService {
     Integer getTotalPageAgency(Integer total);
     Agency createAgency(AgencyRegisterDTO agencyRegisterDTO);
     Agency updateAgency(Agency agency);
-    Agency banAgency(int agencyID);
+    Agency banAgency(int agencyID, boolean isAdmin);
     Agency unBanAgency(int agencyID);
     boolean deleteAgency(int agencyID);
 }

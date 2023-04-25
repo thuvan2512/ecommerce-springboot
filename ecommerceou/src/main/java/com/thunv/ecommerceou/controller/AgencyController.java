@@ -240,7 +240,7 @@ public class AgencyController {
         String code = "200";
         Agency res = null;
         try {
-            res = this.agencyService.banAgency(Integer.parseInt(agencyID));
+            res = this.agencyService.banAgency(Integer.parseInt(agencyID), true);
             String recipient = String.format("agency-%s", agencyID);
             String title = "Your agent has been banned";
             String detail = "Your agent has been banned, please contact the administrator.";

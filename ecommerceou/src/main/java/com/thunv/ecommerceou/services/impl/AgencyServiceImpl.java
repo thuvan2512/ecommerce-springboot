@@ -128,10 +128,13 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    public Agency banAgency(int agencyID)  throws RuntimeException{
+    public Agency banAgency(int agencyID, boolean isAdmin)  throws RuntimeException{
         try {
             Agency agency = this.getAgencyByID(agencyID);
             agency.setIsActive(0);
+            if (isAdmin == true){
+                agency.setDeactivatedByAdmin(1);
+            }
             return this.agencyRepository.save(agency);
         }catch (Exception ex){
             String error_ms = ex.getMessage();
@@ -144,6 +147,7 @@ public class AgencyServiceImpl implements AgencyService {
         try {
             Agency agency = this.getAgencyByID(agencyID);
             agency.setIsActive(1);
+            agency.setDeactivatedByAdmin(0);
             return this.agencyRepository.save(agency);
         }catch (Exception ex){
             String error_ms = ex.getMessage();
