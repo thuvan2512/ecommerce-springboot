@@ -23,4 +23,15 @@ public class AgencySpecification {
             }
         };
     }
+
+    public Specification<Agency> agencyIsCensored() {
+        return new Specification<Agency>() {
+            @Override
+            public Predicate toPredicate(Root<Agency> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicatesList = new ArrayList<>();
+                predicatesList.add(criteriaBuilder.equal(root.get("isCensored").as(Integer.class), 1));
+                return criteriaBuilder.and(predicatesList.toArray(new Predicate[]{}));
+            }
+        };
+    }
 }
