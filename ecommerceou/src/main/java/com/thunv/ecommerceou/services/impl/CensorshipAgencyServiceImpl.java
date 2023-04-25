@@ -60,6 +60,7 @@ public class CensorshipAgencyServiceImpl implements CensorshipAgencyService {
                 }
                 agency.setIsActive(1);
                 agency.setIsCensored(1);
+                agency.setDeactivatedByAdmin(0);
                 this.agencyService.updateAgency(agency);
                 return this.censorshipAgencyRepository.save(censorshipAgency);
             }else {

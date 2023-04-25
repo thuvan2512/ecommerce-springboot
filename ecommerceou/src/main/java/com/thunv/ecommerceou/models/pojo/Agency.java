@@ -73,6 +73,10 @@ public class Agency {
     @Getter @Setter
     private String fromAddress;
 
+    @Column(name = "deactivated_by_admin")
+    @Getter @Setter
+    private Integer deactivatedByAdmin = 1;
+
 
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
