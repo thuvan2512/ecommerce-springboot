@@ -67,6 +67,11 @@ public class RenewalServiceImpl implements RenewalService {
     }
 
     @Override
+    public List<RenewalOrder> getListRenewalOrder() throws RuntimeException{
+        return this.renewalOrderRepository.findAll();
+    }
+
+    @Override
     public void initialTrialForNewAgency(int agencyID) throws RuntimeException{
         Agency agency = this.agencyService.getAgencyByID(agencyID);
         if (this.renewalManageRepository.existsByAgency(agency) == false){
@@ -112,6 +117,11 @@ public class RenewalServiceImpl implements RenewalService {
             }
             this.agencyService.updateAgency(agency);
             this.renewalManageRepository.save(renewalManage);
+            String title = "Record a purchase of a renewal package";
+            String detail = String.format("Agent '%s' just bought a renewal package called '%s'.",
+                    agency.getName(), renewalPackage.getPackageName());
+            String type = "New Renewal Order";
+            this.notifyService.pushNotify("admin", agency.getAvatar(), title, detail, type);
         }
     }
 
