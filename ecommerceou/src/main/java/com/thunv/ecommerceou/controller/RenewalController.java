@@ -84,6 +84,22 @@ public class RenewalController {
         );
     }
 
+    @GetMapping(path = "/get-all-orders-renewal")
+    public ResponseEntity<ModelResponse> getAllOrdersRenewal(){
+        String ms = "Get list orders successfully";
+        String code = "200";
+        Object res = null;
+        try {
+            res = this.renewalService.getListRenewalOrder();
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
+
 
     @GetMapping(path = "/get-renewal-manage-by-agency-id/{agencyID}")
     public ResponseEntity<ModelResponse> getListRenewalManageByAgencyID(@PathVariable(value = "agencyID") String agencyID){
