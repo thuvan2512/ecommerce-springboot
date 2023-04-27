@@ -17,7 +17,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     public String uploadFile(MultipartFile file) {
         try {
             Map upload = this.cloudinary.uploader().upload(file.getBytes(),
-                    ObjectUtils.asMap("resource_type", "auto"));
+                    ObjectUtils.asMap("resource_type", "auto", "folder", "open-market"));
             return  upload.get("secure_url").toString();
         } catch (Exception e) {
             return e.getMessage();
