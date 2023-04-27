@@ -1,6 +1,7 @@
 package com.thunv.ecommerceou.models.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +22,7 @@ public class RenewalOrder {
 
     @JoinColumn(name = "renewal_id", referencedColumnName = "id")
     @ManyToOne
-    @JsonIgnore
+    @JsonIgnoreProperties({"renewalOrderSet"})
     @Getter @Setter
     private RenewalManage renewalManage;
 
