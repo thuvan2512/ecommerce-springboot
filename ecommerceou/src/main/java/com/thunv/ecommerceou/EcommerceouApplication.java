@@ -5,6 +5,8 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.storage.v2.Object;
 import com.thunv.schedule.TaskSchedule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,6 +19,9 @@ import java.util.*;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 
@@ -35,6 +40,9 @@ import javax.annotation.PostConstruct;
 public class EcommerceouApplication  {
 	@Autowired
 	private TaskSchedule taskSchedule;
+
+	private static final Logger logger = LoggerFactory.getLogger(EcommerceouApplication.class);
+
 	@PostConstruct
 	public void executeScheduleTask() {
 		Timer timer = new Timer();
@@ -46,6 +54,8 @@ public class EcommerceouApplication  {
 		};
 		timer.schedule(timerTask1, 0,60000);
 	}
+
+
 	public static void main(String[] args) {
 		try {
 			ClassLoader classLoader = EcommerceouApplication.class.getClassLoader();
@@ -58,8 +68,7 @@ public class EcommerceouApplication  {
 					.build();
 			FirebaseApp.initializeApp(options);
 		}catch (Exception ex){
-			ex.printStackTrace();
-			System.out.println(ex.getMessage());
+			logger.error(ex.getMessage());
 		}
 		SpringApplication.run(EcommerceouApplication.class, args);
 	}
