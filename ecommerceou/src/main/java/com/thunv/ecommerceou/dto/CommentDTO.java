@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 public class CommentDTO {
     @Getter @Setter
     @NotNull(message = "Content can not be null")
-    @Size(min = 1, max = 200,message = "Must be between 1 and 200 characters")
+    @Size(min = 1, max = 500,message = "Must be between 1 and 500 characters")
     private String content;
     @Getter @Setter
     @Min(value = 1,message = "Must be between 1 and 5")
