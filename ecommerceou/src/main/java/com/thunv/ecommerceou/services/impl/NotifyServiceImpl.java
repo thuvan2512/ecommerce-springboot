@@ -9,6 +9,7 @@ import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.FollowAgency;
 import com.thunv.ecommerceou.services.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +20,23 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class NotifyServiceImpl implements NotifyService {
+    @Autowired
+    private Environment env;
     @Override
     @Async
     public void pushNotify(String recipientID, String image, String title, String details, String type) throws RuntimeException {
         try {
-            NotificationEntity notificationEntity = new NotificationEntity();
-            notificationEntity.setTitle(title);
-            notificationEntity.setImage(image);
-            notificationEntity.setDetails(details);
-            notificationEntity.setType(type);
-            Firestore fireStore = FirestoreClient.getFirestore();
-            ApiFuture<WriteResult> collectionApiFuture = fireStore.collection(recipientID)
-                    .document(UUID.randomUUID().toString()).set(notificationEntity);
+            int disableNotify = Integer.parseInt(this.env.getProperty("firebase.cloud_storage.disable_notify"));
+            if (disableNotify == 0){
+                NotificationEntity notificationEntity = new NotificationEntity();
+                notificationEntity.setTitle(title);
+                notificationEntity.setImage(image);
+                notificationEntity.setDetails(details);
+                notificationEntity.setType(type);
+                Firestore fireStore = FirestoreClient.getFirestore();
+                ApiFuture<WriteResult> collectionApiFuture = fireStore.collection(recipientID)
+                        .document(UUID.randomUUID().toString()).set(notificationEntity);
+            }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
