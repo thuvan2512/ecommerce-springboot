@@ -52,7 +52,7 @@ public class EcommerceouApplication  {
 				taskSchedule.scanAndBanExpiredAgent();
 			};
 		};
-		timer.schedule(timerTask1, 0,60000);
+		timer.schedule(timerTask1, 0,7000);
 	}
 
 
