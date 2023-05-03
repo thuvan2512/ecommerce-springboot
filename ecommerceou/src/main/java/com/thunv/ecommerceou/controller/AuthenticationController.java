@@ -81,40 +81,47 @@ public class AuthenticationController {
 //    }
     @GetMapping("/login-google")
     public ResponseEntity<ModelResponse> loginGoogle(HttpServletRequest request) throws IOException {
-        String code = request.getParameter("code");
-        System.out.println(code);
+        try {
+            String code = request.getParameter("code");
+            System.out.println(code);
 //        String ms = "login google successfully";
 //        String codeRes = "200";
 
-        if (code == null || code.isEmpty()) {
-            String msg = "Get%20auth%20token%20failed";
-            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
-        }
-        String accessToken = googleUtils.getToken(code);
-        GoogleEntity googleEntity = googleUtils.getUserInfo(accessToken);
-        if (this.userService.checkExistEmail(googleEntity.getEmail()) != true) {
-            this.googleUtils.createUser(googleEntity);
-            UserDetails userDetail = googleUtils.buildUser(this.userService.loadUserByEmail(googleEntity.getEmail()).get(0));
-            final String token = jwtTokenUtils.generateToken(userDetail);
-//            final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
-//            String ex = this.utils.getDateFormatter().format(expirationDate);
-            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
-        } else {
-            int auth = this.userService.loadUserByEmail(googleEntity.getEmail()).get(0).getAuthProvider().getId();
-            if (auth == 2) {
+            if (code == null || code.isEmpty()) {
+                String msg = "Get%20auth%20token%20failed";
+                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
+            }
+            String accessToken = googleUtils.getToken(code);
+            GoogleEntity googleEntity = googleUtils.getUserInfo(accessToken);
+            if (this.userService.checkExistEmail(googleEntity.getEmail()) != true) {
+                this.googleUtils.createUser(googleEntity);
                 UserDetails userDetail = googleUtils.buildUser(this.userService.loadUserByEmail(googleEntity.getEmail()).get(0));
                 final String token = jwtTokenUtils.generateToken(userDetail);
+//            final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
+//            String ex = this.utils.getDateFormatter().format(expirationDate);
+                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
+            } else {
+                int auth = this.userService.loadUserByEmail(googleEntity.getEmail()).get(0).getAuthProvider().getId();
+                if (auth == 2) {
+                    UserDetails userDetail = googleUtils.buildUser(this.userService.loadUserByEmail(googleEntity.getEmail()).get(0));
+                    final String token = jwtTokenUtils.generateToken(userDetail);
 //                final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
 //                String ex = this.utils.getDateFormatter().format(expirationDate);
-                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
+                    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
 //                return ResponseEntity.status(HttpStatus.OK).body(
 //                        new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
 //                );
-            } else {
-                String msg = "Email%20already%20exist%20in%20this%20system";
-                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
+                } else {
+                    String msg = "Email%20already%20exist%20in%20this%20system";
+                    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
+                }
             }
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ModelResponse("400","Get auth token failed", null)
+        );
     }
     @GetMapping("/login-facebook")
     public ResponseEntity<ModelResponse> loginFacebook(HttpServletRequest request) {
@@ -126,28 +133,35 @@ public class AuthenticationController {
             String msg = "Get%20auth%20token%20failed";
             return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
         }
-        com.restfb.types.User facebookInfo = facebookUtils.getUserInfo(accessToken);
-        if (this.userService.checkExistEmail(facebookInfo.getEmail()) != true) {
-            this.facebookUtils.createUser(facebookInfo);
-            UserDetails userDetail = this.facebookUtils.buildUser(this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0));
-            final String token = jwtTokenUtils.generateToken(userDetail);
+        try {
+            com.restfb.types.User facebookInfo = facebookUtils.getUserInfo(accessToken);
+            if (this.userService.checkExistEmail(facebookInfo.getEmail()) != true) {
+                this.facebookUtils.createUser(facebookInfo);
+                UserDetails userDetail = this.facebookUtils.buildUser(this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0));
+                final String token = jwtTokenUtils.generateToken(userDetail);
 //            final Date expirationDate = this.jwtTokenUtils.getExpirationDateFromToken(token);
 //            String ex = this.utils.getDateFormatter().format(expirationDate);
-            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
+                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
 //            return ResponseEntity.status(HttpStatus.OK).body(
 //                    new ModelResponse("200","Get auth token successfully", new JwtResponse(token,ex))
 //            );
-        } else {
-            int auth = this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0).getAuthProvider().getId();
-            if (auth == 3) {
-                UserDetails userDetail = this.facebookUtils.buildUser(this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0));
-                final String token = jwtTokenUtils.generateToken(userDetail);
-                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
             } else {
-                String msg = "Email%20already%20exist%20in%20this%20system";
-                return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
+                int auth = this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0).getAuthProvider().getId();
+                if (auth == 3) {
+                    UserDetails userDetail = this.facebookUtils.buildUser(this.userService.loadUserByEmail(facebookInfo.getEmail()).get(0));
+                    final String token = jwtTokenUtils.generateToken(userDetail);
+                    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?jwt=%s",this.env.getProperty("fe.url"), token))).build();
+                } else {
+                    String msg = "Email%20already%20exist%20in%20this%20system";
+                    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(String.format("%s?msg=%s",this.env.getProperty("fe.url"), msg))).build();
+                }
             }
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ModelResponse("400","Get auth token failed", null)
+        );
     }
 
     private void authenticate(String username, String password) throws Exception {
