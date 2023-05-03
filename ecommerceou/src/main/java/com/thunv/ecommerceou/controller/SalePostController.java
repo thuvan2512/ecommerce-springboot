@@ -303,33 +303,40 @@ public class SalePostController {
     @PostMapping(value = "/search")
     public ResponseEntity<ModelResponse> searchSalePost(@RequestBody @Valid SearchSalePostDTO searchSalePostDTO,
                                                         BindingResult result){
-        if (result.hasErrors()) {
-            Map<String, String> errors = this.utils.getAllErrorValidation(result);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ModelResponse("400", "Invalid information", errors)
-            );
-        }
-        String ms = "Search sale post successfully";
-        String code = "200";
-        List<SalePost> list = new ArrayList<>();
-        HttpStatus status = HttpStatus.OK;
         try {
-            list = this.salePostService.searchSalePost(searchSalePostDTO);
+            if (result.hasErrors()) {
+                Map<String, String> errors = this.utils.getAllErrorValidation(result);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        new ModelResponse("400", "Invalid information", errors)
+                );
+            }
+            String ms = "Search sale post successfully";
+            String code = "200";
+            List<SalePost> list = new ArrayList<>();
+            HttpStatus status = HttpStatus.OK;
+            try {
+                list = this.salePostService.searchSalePost(searchSalePostDTO);
+            }catch (Exception ex){
+                ms = ex.getMessage();
+                code = "400";
+                status = HttpStatus.BAD_REQUEST;
+            }
+            Integer total;
+            Integer totalPage;
+            total = this.salePostService.countSalePost();
+            totalPage = this.salePostService.getTotalPageSalePost(total);
+            SearchResponse searchResponse = new SearchResponse(totalPage,
+                    Integer.parseInt(this.env.getProperty("post.paginate.size")),
+                    total,
+                    searchSalePostDTO.getPage(),list.size(), Arrays.asList(list.toArray()));
+            return ResponseEntity.status(status).body(
+                    new ModelResponse(code,ms,searchResponse)
+            );
         }catch (Exception ex){
-            ms = ex.getMessage();
-            code = "400";
-            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
         }
-        Integer total;
-        Integer totalPage;
-        total = this.salePostService.countSalePost();
-        totalPage = this.salePostService.getTotalPageSalePost(total);
-        SearchResponse searchResponse = new SearchResponse(totalPage,
-                Integer.parseInt(this.env.getProperty("post.paginate.size")),
-                total,
-                searchSalePostDTO.getPage(),list.size(), Arrays.asList(list.toArray()));
-        return ResponseEntity.status(status).body(
-                new ModelResponse(code,ms,searchResponse)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ModelResponse("400","Failed", null)
         );
     }
     @GetMapping(value = "/get-keywords-suggest-for-search")

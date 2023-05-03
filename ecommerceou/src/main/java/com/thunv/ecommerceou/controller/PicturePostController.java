@@ -74,9 +74,6 @@ public class PicturePostController {
         String ms = "Insert picture successfully";
         String code = "201";
         PicturePost pic = null;
-        if (result.hasErrors()){
-            System.out.println("ABC");
-        }
         try {
             pic = this.picturePostService.createPicturePost(picturePostDTO);
         }catch (Exception ex){
