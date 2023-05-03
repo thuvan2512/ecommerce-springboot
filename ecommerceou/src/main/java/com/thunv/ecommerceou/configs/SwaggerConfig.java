@@ -30,7 +30,7 @@ public class SwaggerConfig {
     }
     private ApiInfo apiInfo() {
         return new ApiInfo(
-                "ECOMMERCE OU",
+                "ECOM OPEN MARKET",
                 "REST APIs For Ecommerce Web Application.",
                 "API v1",
                 "Terms of service",
