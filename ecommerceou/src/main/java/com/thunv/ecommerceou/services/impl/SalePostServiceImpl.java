@@ -3,6 +3,7 @@ package com.thunv.ecommerceou.services.impl;
 import com.thunv.ecommerceou.dto.SalePostCreateDTO;
 import com.thunv.ecommerceou.dto.SearchSalePostDTO;
 import com.thunv.ecommerceou.models.pojo.*;
+import com.thunv.ecommerceou.repositories.CartItemRepository;
 import com.thunv.ecommerceou.repositories.SalePostRepository;
 import com.thunv.ecommerceou.specifications.SalePostSpecification;
 import com.thunv.ecommerceou.services.*;
@@ -34,6 +35,10 @@ public class SalePostServiceImpl implements SalePostService {
     private NotifyService notifyService;
     @Autowired
     private SalePostSpecification salePostSpecification;
+    @Autowired
+    private ItemService itemService;
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
     @Override
     public SalePost getSalePostByID(int postID) throws RuntimeException {
@@ -127,6 +132,13 @@ public class SalePostServiceImpl implements SalePostService {
     public SalePost unPublishSalePost(SalePost salePost) throws RuntimeException {
         try {
             salePost.setIsActive(0);
+            List<ItemPost> itemPostList = this.itemService.getListItemBySalePost(salePost);
+            for (ItemPost itemPost: itemPostList){
+                List<CartItem> cartItemList = this.cartItemRepository.findByItemPost(itemPost);
+                for (CartItem cartItem: cartItemList){
+                    this.cartItemRepository.deleteById(cartItem.getId());
+                }
+            }
             return this.salePostRepository.save(salePost);
         } catch (Exception ex) {
             String error_ms = ex.getMessage();
