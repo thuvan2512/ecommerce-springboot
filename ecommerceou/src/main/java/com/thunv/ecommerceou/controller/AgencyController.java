@@ -134,33 +134,40 @@ public class AgencyController {
     @PostMapping(value = "/search")
     public ResponseEntity<ModelResponse> searchAgency(@RequestBody @Valid SearchAgencyDTO searchAgencyDTO,
                                                       BindingResult result){
-        if (result.hasErrors()) {
-            Map<String, String> errors = this.utils.getAllErrorValidation(result);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ModelResponse("400", "Invalid information", errors)
-            );
-        }
-        String ms = "Search agency successfully";
-        String code = "200";
-        List<Agency> list = null;
-        HttpStatus status = HttpStatus.OK;
         try {
-            list = this.agencyService.searchAgency(searchAgencyDTO);
+            if (result.hasErrors()) {
+                Map<String, String> errors = this.utils.getAllErrorValidation(result);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        new ModelResponse("400", "Invalid information", errors)
+                );
+            }
+            String ms = "Search agency successfully";
+            String code = "200";
+            List<Agency> list = null;
+            HttpStatus status = HttpStatus.OK;
+            try {
+                list = this.agencyService.searchAgency(searchAgencyDTO);
+            }catch (Exception ex){
+                ms = ex.getMessage();
+                code = "400";
+                status = HttpStatus.BAD_REQUEST;
+            }
+            Integer total;
+            Integer totalPage;
+            total = this.agencyService.countAgency();
+            totalPage = this.agencyService.getTotalPageAgency(total);
+            SearchResponse searchResponse = new SearchResponse(totalPage,
+                    Integer.parseInt(this.env.getProperty("page.size")),
+                    total,
+                    searchAgencyDTO.getPage(),list.size(), Arrays.asList(list.toArray()));
+            return ResponseEntity.status(status).body(
+                    new ModelResponse(code,ms,searchResponse)
+            );
         }catch (Exception ex){
-            ms = ex.getMessage();
-            code = "400";
-            status = HttpStatus.BAD_REQUEST;
+            ex.printStackTrace();
         }
-        Integer total;
-        Integer totalPage;
-        total = this.agencyService.countAgency();
-        totalPage = this.agencyService.getTotalPageAgency(total);
-        SearchResponse searchResponse = new SearchResponse(totalPage,
-                Integer.parseInt(this.env.getProperty("page.size")),
-                total,
-                searchAgencyDTO.getPage(),list.size(), Arrays.asList(list.toArray()));
-        return ResponseEntity.status(status).body(
-                new ModelResponse(code,ms,searchResponse)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ModelResponse("400","Failed", null)
         );
     }
     @PostMapping(path = "/register")
