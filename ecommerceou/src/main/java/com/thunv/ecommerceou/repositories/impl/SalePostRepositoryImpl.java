@@ -148,6 +148,8 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         predicates.add(p2);
         Predicate p3 = builder.equal(rootLike.get("state"), 1);
         predicates.add(p3);
+        Predicate p4 = builder.equal(rootSalePost.get("isActive"), 1);
+        predicates.add(p4);
         query.where(predicates.toArray(new Predicate[]{}));
         Query q = session.createQuery(query);
         return q.getResultList();
