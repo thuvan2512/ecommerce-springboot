@@ -3,7 +3,7 @@
   <img src="https://res.cloudinary.com/dec25/image/upload/v1683117159/avtArtboard_18_2x-100_l1mifl.jpg" alt="(course project)" width="120">
 <br>
 <br>
-Ecommerce web application
+Ecom Open Market
 </h1>
 
 <p align="center">This is an e-commerce application written in java source code(Spring Boot)
