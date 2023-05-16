@@ -88,6 +88,7 @@ public class AgencyRepositoryImpl implements AgencyRepositoryCustom {
                 criteriaBuilder.equal(rootPost.get("id"), rootLike.get("salePost")));
         criteriaQuery.multiselect(root, criteriaBuilder.count(rootLike.get("id")).as(Integer.class));
         criteriaQuery.groupBy(root.get("id"));
+        criteriaQuery.orderBy(criteriaBuilder.desc(criteriaBuilder.count(rootLike.get("id")).as(Integer.class)));
         Query query = session.createQuery(criteriaQuery);
         query.setMaxResults(top);
         return query.getResultList();
