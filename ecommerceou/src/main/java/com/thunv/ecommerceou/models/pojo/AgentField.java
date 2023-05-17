@@ -19,9 +19,15 @@ public class AgentField {
     @Column(name = "id")
     @Getter @Setter
     private Integer id;
+
     @Column(name = "name")
     @Getter @Setter
     private String name;
+
+    @Column(name = "name_en")
+    @Getter @Setter
+    private String nameEn;
+
     @OneToMany(mappedBy = "field")
     @JsonIgnore
     @Getter

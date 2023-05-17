@@ -17,9 +17,15 @@ public class Gender {
     @Column(name = "id")
     @Getter @Setter
     private Integer id;
+
     @Column(name = "name")
     @Getter @Setter
     private String name;
+
+    @Column(name = "name_vi")
+    @Getter @Setter
+    private String nameVi;
+
     @OneToMany(mappedBy = "gender")
     @Getter
     @Setter
