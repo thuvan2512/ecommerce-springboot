@@ -14,7 +14,6 @@ public class CategoryDTO {
     @Getter @Setter
     private String name;
 
-    @NotNull(message = "Name_vi of category can't be not null")
     @Getter @Setter
     private String nameVi;
 
