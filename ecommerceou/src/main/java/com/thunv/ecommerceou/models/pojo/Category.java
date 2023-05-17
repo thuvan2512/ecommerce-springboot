@@ -20,16 +20,24 @@ public class Category {
     @Column(name = "id")
     @Getter @Setter
     private Integer id;
+
     @Column(name = "name")
     @Getter @Setter
     @Size(min = 1,max = 100,message = "Must be between 1 and 100 characters")
     private String name;
+
+    @Column(name = "name_vi")
+    @Getter @Setter
+    private String nameVi;
+
     @Column(name = "avatar")
     @Getter @Setter
     private String avatar;
+
     @Column(name = "active")
     @Getter @Setter
     private Integer active;
+
     @JsonIgnore
     @OneToMany(mappedBy = "category",fetch = FetchType.EAGER)
 //    @JsonIgnoreProperties({"field"})

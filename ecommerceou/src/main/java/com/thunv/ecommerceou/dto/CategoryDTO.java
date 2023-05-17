@@ -9,9 +9,15 @@ public class CategoryDTO {
     @NotNull(message = "Picture of category can't be not null")
     @Getter @Setter
     private String avatar;
+
     @NotNull(message = "Name of category can't be not null")
     @Getter @Setter
     private String name;
+
+    @NotNull(message = "Name_vi of category can't be not null")
+    @Getter @Setter
+    private String nameVi;
+
     @Getter @Setter
     private Integer active;
 }

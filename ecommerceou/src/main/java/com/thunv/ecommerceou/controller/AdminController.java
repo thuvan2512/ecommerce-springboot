@@ -116,6 +116,7 @@ public class AdminController {
                 Category category = new Category();
                 category.setName(cateDTO.getName());
                 category.setAvatar(cateDTO.getAvatar());
+                category.setNameVi(cateDTO.getNameVi());
                 res = this.categoryService.createCategory(category);
             }else {
                 ms = "Invalid infomation of category object";
@@ -155,6 +156,9 @@ public class AdminController {
                     }
                     if (cateDTO.getActive() != null){
                         category.setActive(cateDTO.getActive());
+                    }
+                    if (cateDTO.getNameVi() != null){
+                        category.setNameVi(cateDTO.getNameVi());
                     }
                     res = this.categoryService.updateCategory(category);
                 }
