@@ -6,9 +6,11 @@ import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Parameter;
 import com.restfb.Version;
+import com.thunv.ecommerceou.models.enumerate.NotificationImages;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.UserRepository;
 import com.thunv.ecommerceou.services.AuthProviderService;
+import com.thunv.ecommerceou.services.NotifyService;
 import com.thunv.ecommerceou.services.RoleService;
 import com.thunv.ecommerceou.services.UserService;
 import org.apache.http.client.ClientProtocolException;
@@ -41,6 +43,8 @@ public class FacebookUtils {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthProviderService authProviderService;
+    @Autowired
+    private NotifyService notifyService;
 
     public static String FACEBOOK_LINK_GET_TOKEN = "https://graph.facebook.com/oauth/access_token?client_id=%s&client_secret=%s&redirect_uri=%s&code=%s";
 
@@ -75,6 +79,11 @@ public class FacebookUtils {
             user.setJoinedDate(new Date());
             try {
                 this.userRepository.save(user);
+                String recipientAgency = String.format("user-%s", user.getId());
+                String title = "Welcome to Open Market";
+                String detail = "Welcome to the Open Market. Wish you have a great shopping experience here !!!";
+                String type = "Welcome new user";
+                this.notifyService.pushNotify(recipientAgency, NotificationImages.APP_LOGO.getValue(), title, detail, type);
                 return true;
             } catch (Exception e) {
                 return false;

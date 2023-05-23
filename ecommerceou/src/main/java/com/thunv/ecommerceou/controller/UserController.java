@@ -2,9 +2,11 @@ package com.thunv.ecommerceou.controller;
 
 import com.thunv.ecommerceou.dto.*;
 import com.thunv.ecommerceou.jwt.JwtTokenUtils;
+import com.thunv.ecommerceou.models.enumerate.NotificationImages;
 import com.thunv.ecommerceou.res.ModelResponse;
 import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.services.ConfirmCodeService;
+import com.thunv.ecommerceou.services.NotifyService;
 import com.thunv.ecommerceou.services.UserService;
 import com.thunv.ecommerceou.utils.Utils;
 import com.thunv.ecommerceou.validator.CommonChangePasswordDTOValidator;
@@ -40,6 +42,8 @@ public class UserController {
     private JwtTokenUtils jwtTokenUtils;
     @Autowired
     private ConfirmCodeService confirmCodeService;
+    @Autowired
+    private NotifyService notifyService;
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         try {
@@ -125,6 +129,12 @@ public class UserController {
         User res = null;
         try {
             res = this.userService.registerUser(userRegisterDTO);
+            String recipientAgency = String.format("user-%s", res.getId());
+            String title = "Welcome to Open Market";
+            String detail = "Welcome to the Open Market. Wish you have a great shopping experience here !!!";
+            String type = "Welcome new user";
+            this.notifyService.pushNotify(recipientAgency, NotificationImages.APP_LOGO.getValue(), title, detail, type);
+
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
