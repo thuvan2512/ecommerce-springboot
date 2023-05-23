@@ -5,6 +5,7 @@ import com.thunv.ecommerceou.models.pojo.User;
 import com.thunv.ecommerceou.repositories.CustomerAddressBookRepository;
 import com.thunv.ecommerceou.services.CustomerAddressBookService;
 import com.thunv.ecommerceou.services.UserService;
+import com.thunv.ecommerceou.specifications.CustomerAddressBookSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -15,6 +16,8 @@ public class CustomerAddressBookServiceImpl implements CustomerAddressBookServic
     private CustomerAddressBookRepository customerAddressBookRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private CustomerAddressBookSpecification customerAddressBookSpecification;
 
     @Override
     public CustomerAddressBook getAddressByID(Integer addressID) throws RuntimeException{
@@ -26,7 +29,7 @@ public class CustomerAddressBookServiceImpl implements CustomerAddressBookServic
     public List<CustomerAddressBook> getCustomerAddressBookByUserID(Integer userID) throws RuntimeException{
         try {
             User user = this.userService.getUserByID(userID);
-            List<CustomerAddressBook> listResults = this.customerAddressBookRepository.findByCustomer(user);
+            List<CustomerAddressBook> listResults = this.customerAddressBookRepository.findAll(this.customerAddressBookSpecification.getAddressBookByUser(user));
             return listResults;
         }catch (Exception ex){
             String error_ms = ex.getMessage();
@@ -51,7 +54,9 @@ public class CustomerAddressBookServiceImpl implements CustomerAddressBookServic
             if (this.customerAddressBookRepository.existsById(addressID) == false){
                 throw new RuntimeException("Address does not exist");
             }
-            this.customerAddressBookRepository.deleteById(addressID);
+            CustomerAddressBook customerAddressBook = getAddressByID(addressID);
+            customerAddressBook.setUpdatedDate(null);
+            this.customerAddressBookRepository.save(customerAddressBook);
             return true;
         }catch (Exception ex){
             String error_ms = ex.getMessage();
