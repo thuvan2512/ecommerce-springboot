@@ -1,5 +1,6 @@
 package com.thunv.ecommerceou.repositories.impl;
 
+import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.LikePost;
 import com.thunv.ecommerceou.models.pojo.SalePost;
 import com.thunv.ecommerceou.models.pojo.User;
@@ -82,6 +83,18 @@ public class LikePostRepositoryImpl implements LikePostRepositoryCustom {
         Root root = query.from(LikePost.class);
         query.select(builder.count(root.get("salePost")).as(Integer.class));
         query.where(builder.equal(root.get("salePost").get("id"), salePost.getId()));
+        Query q = session.createQuery(query);
+        return (int) q.getSingleResult();
+    }
+
+    @Override
+    public int countLikeByAgency(Agency agency) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Integer> query = builder.createQuery(Integer.class);
+        Root root = query.from(LikePost.class);
+        query.select(builder.count(root.get("salePost")).as(Integer.class));
+        query.where(builder.equal(root.get("salePost").get("agency").get("id"), agency.getId()));
         Query q = session.createQuery(query);
         return (int) q.getSingleResult();
     }

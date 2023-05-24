@@ -46,6 +46,17 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         Query q = session.createQuery(query);
         return (int) q.getSingleResult();
     }
+    @Override
+    public int countCommentByAgency(Agency agency) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Integer> query = builder.createQuery(Integer.class);
+        Root root = query.from(CommentPost.class);
+        query.select(builder.count(root.get("salePost")).as(Integer.class));
+        query.where(builder.equal(root.get("salePost").get("agency").get("id"), agency.getId()));
+        Query q = session.createQuery(query);
+        return (int) q.getSingleResult();
+    }
 
     @Override
     public double getAverageStarByAgency(Agency agency) {

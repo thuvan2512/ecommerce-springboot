@@ -93,6 +93,16 @@ public class CommentPostServiceImpl implements CommentService {
     }
 
     @Override
+    public int countCommentByAgency(Agency agency) throws RuntimeException{
+        try {
+            return this.commentRepository.countCommentByAgency(agency);
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
     public double getAverageStarByAgency(Agency agency) throws RuntimeException{
         try {
             return this.commentRepository.getAverageStarByAgency(agency);

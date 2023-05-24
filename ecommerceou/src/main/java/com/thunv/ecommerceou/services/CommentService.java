@@ -16,5 +16,6 @@ public interface CommentService {
     boolean deleteCommentPost(int commentID);
     List<CommentPost> getListCommentByPost(SalePost salePost);
     int countCommentByPost(SalePost salePost);
+    int countCommentByAgency(Agency agency);
     double getAverageStarByAgency(Agency agency);
 }
