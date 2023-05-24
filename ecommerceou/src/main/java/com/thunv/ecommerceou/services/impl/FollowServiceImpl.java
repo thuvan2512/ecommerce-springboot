@@ -66,7 +66,7 @@ public class FollowServiceImpl implements FollowService {
     @Override
     public int countFollowByAgency(Agency agency) throws RuntimeException{
         try {
-            return this.followRepository.countFollowByPost(agency);
+            return this.followRepository.countFollowByAgency(agency);
         }catch (Exception ex){
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);
