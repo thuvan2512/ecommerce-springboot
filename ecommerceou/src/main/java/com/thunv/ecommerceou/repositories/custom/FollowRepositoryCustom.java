@@ -9,7 +9,7 @@ import com.thunv.ecommerceou.models.pojo.User;
 public interface FollowRepositoryCustom {
     Boolean checkExistFollow(User user, Agency agency);
     FollowAgency getFollowExist(User user, Agency agency);
-    int countFollowByPost(Agency agency);
+    int countFollowByAgency(Agency agency);
 
 
 }

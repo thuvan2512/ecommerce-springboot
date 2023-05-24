@@ -76,13 +76,14 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
     }
 
     @Override
-    public int countFollowByPost(Agency agency) {
+    public int countFollowByAgency(Agency agency) {
         Session session = this.sessionFactoryBean.getObject().getCurrentSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Integer> query = builder.createQuery(Integer.class);
         Root root = query.from(FollowAgency.class);
         query.select(builder.count(root.get("agency")).as(Integer.class));
-        query.where(builder.equal(root.get("agency").get("id"), agency.getId()));
+        query.where(builder.and(builder.equal(root.get("agency").get("id"), agency.getId())),
+                builder.equal(root.get("state"), 1));
         Query q = session.createQuery(query);
         return (int) q.getSingleResult();
     }

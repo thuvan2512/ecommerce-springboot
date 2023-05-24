@@ -82,7 +82,8 @@ public class LikePostRepositoryImpl implements LikePostRepositoryCustom {
         CriteriaQuery<Integer> query = builder.createQuery(Integer.class);
         Root root = query.from(LikePost.class);
         query.select(builder.count(root.get("salePost")).as(Integer.class));
-        query.where(builder.equal(root.get("salePost").get("id"), salePost.getId()));
+        query.where(builder.and(builder.equal(root.get("salePost").get("id"), salePost.getId()),
+                builder.equal(root.get("state"), 1)));
         Query q = session.createQuery(query);
         return (int) q.getSingleResult();
     }
@@ -94,7 +95,8 @@ public class LikePostRepositoryImpl implements LikePostRepositoryCustom {
         CriteriaQuery<Integer> query = builder.createQuery(Integer.class);
         Root root = query.from(LikePost.class);
         query.select(builder.count(root.get("salePost")).as(Integer.class));
-        query.where(builder.equal(root.get("salePost").get("agency").get("id"), agency.getId()));
+        query.where(builder.and(builder.equal(root.get("salePost").get("agency").get("id"), agency.getId())),
+                builder.equal(root.get("state"), 1));
         Query q = session.createQuery(query);
         return (int) q.getSingleResult();
     }
