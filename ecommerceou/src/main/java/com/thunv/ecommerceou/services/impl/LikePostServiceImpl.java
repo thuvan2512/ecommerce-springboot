@@ -1,6 +1,7 @@
 package com.thunv.ecommerceou.services.impl;
 
 import com.thunv.ecommerceou.models.enumerate.NotificationImages;
+import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.LikePost;
 import com.thunv.ecommerceou.models.pojo.SalePost;
 import com.thunv.ecommerceou.models.pojo.User;
@@ -64,6 +65,16 @@ public class LikePostServiceImpl implements LikePostService {
     public int countLikeByPost(SalePost salePost) {
         try {
             return this.likePostRepository.countLikeByPost(salePost);
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
+    public int countLikeByAgency(Agency agency) {
+        try {
+            return this.likePostRepository.countLikeByAgency(agency);
         }catch (Exception ex){
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);

@@ -1,5 +1,6 @@
 package com.thunv.ecommerceou.services;
 
+import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.LikePost;
 import com.thunv.ecommerceou.models.pojo.SalePost;
 import com.thunv.ecommerceou.models.pojo.User;
@@ -11,4 +12,6 @@ public interface LikePostService {
     boolean getLikeStatePostByUser(User user, SalePost salePost);
 
     int countLikeByPost(SalePost salePost);
+
+    int countLikeByAgency(Agency agency);
 }

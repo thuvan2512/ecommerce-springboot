@@ -9,5 +9,6 @@ import java.util.List;
 public interface CommentRepositoryCustom {
     List<CommentPost> getListCommentByPost(SalePost salePost);
     int countCommentByPost(SalePost salePost);
+    int countCommentByAgency(Agency agency);
     double getAverageStarByAgency(Agency agency);
 }
