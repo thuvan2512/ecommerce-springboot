@@ -200,6 +200,26 @@ public class SalePostServiceImpl implements SalePostService {
     }
 
     @Override
+    public List<Object[]> getTopSellerByAgency(int top, Agency agency) throws RuntimeException{
+        try {
+            return this.salePostRepository.getTopSellerByAgency(top, agency);
+        } catch (Exception ex) {
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
+    public List<Object[]> getStatsInfoOfCommentByPost(SalePost salePost) throws RuntimeException{
+        try {
+            return this.utils.customListStatsComment(this.salePostRepository.getStatsInfoOfCommentByPost(salePost));
+        } catch (Exception ex) {
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
     public Integer countSalePost() throws RuntimeException {
         try {
             return Math.toIntExact(this.salePostRepository.count(this.salePostSpecification.salePostValidToPublish()));

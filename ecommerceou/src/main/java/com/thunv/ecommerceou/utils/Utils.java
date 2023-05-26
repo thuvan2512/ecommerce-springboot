@@ -126,6 +126,31 @@ public class Utils {
         }
         return null;
     }
+    public List<Object[]> customListStatsComment(List<Object[]> list) {
+        try {
+            boolean flag = false;
+            if (list != null) {
+                for (int i = 1; i <= 5; i++) {
+                    for (int j = 0; j < list.size(); j++) {
+                        if (i == (int) list.get(j)[0]) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (flag == false) {
+                        Object[] term = {i, 0};
+                        list.add(term);
+                    }
+                    flag = false;
+                }
+                Collections.sort(list, (Object[] a1, Object[] a2) -> (int) a1[0] - (int) a2[0]);
+            }
+            return list;
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
+        return null;
+    }
 
     public String customMailForPayment(List<CartItem> cartItemList, Double shipFee){
         try {

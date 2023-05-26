@@ -132,6 +132,38 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         return q.getResultList();
     }
 
+    @Override
+    public List<Object[]> getTopSellerByAgency(int top, Agency agency) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> query = builder.createQuery(Object[].class);
+        Root rootItem = query.from(ItemPost.class);
+        Root rootOrder = query.from(OrderDetail.class);
+        query.where(builder.and(builder.equal(rootItem.get("id"), rootOrder.get("itemPost").get("id")),
+                builder.equal(rootItem.get("salePost").get("agency").get("id"), agency.getId())));
+        query.multiselect(rootItem.get("id"), rootItem.get("salePost").as(SalePost.class), rootItem.get("name"),
+                rootItem.get("unitPrice"), builder.sum(rootOrder.get("quantity")), rootItem.get("description"),rootItem.get("avatar"));
+        query.groupBy(rootItem.get("id"));
+        query.orderBy(builder.desc(builder.sum(rootOrder.get("quantity"))));
+        Query q = session.createQuery(query);
+        q.setMaxResults(top);
+        return q.getResultList();
+    }
+
+    @Override
+    public List<Object[]> getStatsInfoOfCommentByPost(SalePost salePost) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> query = builder.createQuery(Object[].class);
+        Root rootComment = query.from(CommentPost.class);
+        query.where(builder.equal(rootComment.get("salePost").get("id"), salePost.getId()));
+        query.multiselect(rootComment.get("starRate"), builder.count(rootComment.get("id")));
+        query.groupBy(rootComment.get("starRate"));
+        query.orderBy(builder.asc(rootComment.get("starRate")));
+        Query q = session.createQuery(query);
+        return q.getResultList();
+    }
+
 
     @Override
     public List<SalePost> getListSalePostLikeByUser(User user) {

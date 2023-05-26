@@ -29,6 +29,8 @@ public interface SalePostService {
     SalePost updateSalePost(SalePost salePost);
     boolean deleteSalePost(int postID);
     List<Object[]> getTopSeller(int top);
+    List<Object[]> getTopSellerByAgency(int top, Agency agency);
+    List<Object[]> getStatsInfoOfCommentByPost(SalePost salePost);
     Integer getTotalPageSalePost(Integer total);
     List<Object[]> getStatsSalePostByCategory(Agency agency);
     List<Object[]> getStatsSalePostByCategory();
