@@ -38,6 +38,25 @@ public class ActionController {
     @Autowired
     private Utils utils;
 
+    @GetMapping(value = "/comment/stats-comments-by-sale-post/{postID}")
+    public ResponseEntity<ModelResponse> getStatsOfCommentBySalePost(@PathVariable(value = "postID") String postID){
+        String ms = "Get stats of comments by sale post successfully";
+        String code = "200";
+        Object response = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            SalePost salePost = this.salePostService.getSalePostByID(Integer.parseInt(postID));
+            response = this.salePostService.getStatsInfoOfCommentByPost(salePost);
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,response)
+        );
+    }
+
     @GetMapping(value = "/like/{postID}")
     public ResponseEntity<ModelResponse> likePostAction(@PathVariable(value = "postID") String postID,
                                                         HttpServletRequest request) {

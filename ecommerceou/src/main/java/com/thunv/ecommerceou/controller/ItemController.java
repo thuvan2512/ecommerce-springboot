@@ -2,9 +2,11 @@ package com.thunv.ecommerceou.controller;
 
 import com.thunv.ecommerceou.dto.ItemCreateDTO;
 import com.thunv.ecommerceou.dto.ItemUpdateDTO;
+import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.ItemPost;
 import com.thunv.ecommerceou.models.pojo.SalePost;
 import com.thunv.ecommerceou.res.ModelResponse;
+import com.thunv.ecommerceou.services.AgencyService;
 import com.thunv.ecommerceou.services.ItemService;
 import com.thunv.ecommerceou.services.SalePostService;
 import com.thunv.ecommerceou.utils.Utils;
@@ -27,6 +29,8 @@ public class ItemController {
     private ItemService itemService;
     @Autowired
     private SalePostService salePostService;
+    @Autowired
+    private AgencyService agencyService;
     @Autowired
     private Utils utils;
     @GetMapping(value = "/{itemID}")
@@ -80,6 +84,27 @@ public class ItemController {
                 new ModelResponse(code,ms,list)
         );
     }
+
+    @GetMapping(value = "/top-seller-by-agency/{top}/{agencyID}")
+    public ResponseEntity<ModelResponse> getTopSellerItemByAgency(@PathVariable(value = "top") String top,
+                                                                  @PathVariable(value = "agencyID") String agencyID){
+        String ms = "Get top seller items by agency successfully";
+        String code = "200";
+        List<Object[]> list = null;
+        HttpStatus status = HttpStatus.OK;
+        try {
+            Agency agency = this.agencyService.getAgencyByID(Integer.parseInt(agencyID));
+            list = this.salePostService.getTopSellerByAgency(Integer.parseInt(top), agency);
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code,ms,list)
+        );
+    }
+
     @GetMapping(value = "/{postID}/all")
     public ResponseEntity<ModelResponse> getAllItemOfSalePost(@PathVariable(value = "postID") String postID){
         String ms = "Get all items of post successfully";
