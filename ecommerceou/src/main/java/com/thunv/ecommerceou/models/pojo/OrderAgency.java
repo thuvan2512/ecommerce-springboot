@@ -52,6 +52,11 @@ public class OrderAgency {
     @Setter
     private Double totalPrice;
 
+    @Column(name = "reduction_amount_voucher")
+    @Getter
+    @Setter
+    private Double reductionAmountVoucher = 0.0;
+
     @ManyToOne
     @JoinColumn(name = "delivery_info",referencedColumnName = "id")
     @Getter

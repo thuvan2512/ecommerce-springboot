@@ -118,6 +118,11 @@ public class Agency {
     @JsonIgnore
     @Getter @Setter
     private Set<RenewalManage> renewalManageSet;
+
+    @OneToMany(mappedBy = "agency",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    @Getter @Setter
+    private Set<PromotionProgram> promotionProgramSet;
     public Agency() {
 
     }

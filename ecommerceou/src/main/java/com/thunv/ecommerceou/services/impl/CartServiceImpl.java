@@ -42,6 +42,8 @@ public class CartServiceImpl implements CartService {
     private OrderTrackingService orderTrackingService;
     @Autowired
     private NotifyService notifyService;
+    @Autowired
+    private PromotionService promotionService;
     @Override
     public List<CartItem> addToCart(User user, ItemPost itemPost, int quantity) throws RuntimeException{
         try {
@@ -162,7 +164,14 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook, Map<Integer, Map<String, String>> mapServiceInfo) throws RuntimeException{
         try {
+            for (Map<String, String> mapServiceCheckVoucher: mapServiceInfo.values()){
+                String voucherCode = mapServiceCheckVoucher.get("voucher");
+                if (voucherCode != null){
+                    this.promotionService.checkAvailablePromotionCode(voucherCode);
+                }
+            }
             Double shipFee = 0.0;
+            Double totalDiscount = 0.0;
             if (this.utils.checkPhoneNumberIsValid(customerAddressBook.getDeliveryPhone())== false){
                 throw new RuntimeException("Invalid phone !!!");
             }
@@ -204,17 +213,34 @@ public class CartServiceImpl implements CartService {
                     orderAgency.setOrders(orders);
                     orderAgency.setOrderState(this.orderStateService.getOrderStateByID(1));
                     Double totalPrice = 0.0;
+                    Double discount = 0.0;
+                    String promotionCode = mapServiceInfo.get(v.getKey()).get("voucher");
+                    PromotionProgram promotionProgram = this.promotionService.getProgramByPromotionCode(promotionCode);
                     for (CartItem cartItem: v.getValue()){
-                        totalPrice += cartItem.getQuantity() * cartItem.getItemPost().getUnitPrice();
+                        Double total = cartItem.getQuantity() * cartItem.getItemPost().getUnitPrice();
+                        totalPrice += total;
+                        if (promotionProgram != null){
+                            Double percentDiscount = promotionProgram.getPercentageReduction()*1.0 / 100;
+                            if (!promotionProgram.getAvailableSku().strip().toUpperCase().equals("ALL")){
+                                if (promotionProgram.getAvailableSku().contains(String.format(";%s;", cartItem.getItemPost().getSalePost().getId().toString()))){
+                                    discount += (total * percentDiscount > promotionProgram.getReductionAmountMax() ? promotionProgram.getReductionAmountMax(): total * percentDiscount);
+                                }
+                            }else {
+                                discount += (total * percentDiscount > promotionProgram.getReductionAmountMax() ? promotionProgram.getReductionAmountMax(): total * percentDiscount);
+                            }
+                        }
                     }
-                    orderAgency.setTotalPrice(totalPrice);
+                    this.promotionService.useVoucher(promotionCode);
+                    totalDiscount += discount;
+                    orderAgency.setReductionAmountVoucher(discount);
+                    orderAgency.setTotalPrice(totalPrice - discount);
                     String orderCode = "Undefined";
                     try {
                         Integer payShipType;
                         Integer amountCOD;
                         if (paymentType.getId() == 1){
                             payShipType = 2;
-                            amountCOD = (int)(double) totalPrice;
+                            amountCOD = (int)(double) (totalPrice - discount);
                         }else {
                             payShipType = 1;
                             amountCOD = 0;
@@ -276,7 +302,7 @@ public class CartServiceImpl implements CartService {
                 String title = String.format("Dear %s,", user.getUsername());
                 String content = "We have received your order";
                 String mailTemplate = "mail";
-                String items = this.utils.customMailForPayment(cartItemList, shipFee);
+                String items = this.utils.customMailForPayment(cartItemList, shipFee, totalDiscount);
                 this.mailService.sendMail(mailTo,subject,title,content,items,mailTemplate);
                 for (CartItem cartItem: cartItemList){
                     this.cartItemRepository.deleteById(cartItem.getId());
