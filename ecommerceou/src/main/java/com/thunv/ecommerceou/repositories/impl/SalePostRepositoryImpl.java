@@ -122,7 +122,8 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         CriteriaQuery<Object[]> query = builder.createQuery(Object[].class);
         Root rootItem = query.from(ItemPost.class);
         Root rootOrder = query.from(OrderDetail.class);
-        query.where(builder.equal(rootItem.get("id"), rootOrder.get("itemPost").get("id")));
+        query.where(builder.and(builder.equal(rootItem.get("id"), rootOrder.get("itemPost").get("id")),
+                builder.notEqual(rootOrder.get("orderAgency").get("orderState").get("id"),6)));
         query.multiselect(rootItem.get("id"), rootItem.get("salePost").as(SalePost.class), rootItem.get("name"),
                 rootItem.get("unitPrice"), builder.sum(rootOrder.get("quantity")), rootItem.get("description"),rootItem.get("avatar"));
         query.groupBy(rootItem.get("id"));
@@ -140,7 +141,8 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
         Root rootItem = query.from(ItemPost.class);
         Root rootOrder = query.from(OrderDetail.class);
         query.where(builder.and(builder.equal(rootItem.get("id"), rootOrder.get("itemPost").get("id")),
-                builder.equal(rootItem.get("salePost").get("agency").get("id"), agency.getId())));
+                builder.equal(rootItem.get("salePost").get("agency").get("id"), agency.getId()),
+                builder.notEqual(rootOrder.get("orderAgency").get("orderState").get("id"),6)));
         query.multiselect(rootItem.get("id"), rootItem.get("salePost").as(SalePost.class), rootItem.get("name"),
                 rootItem.get("unitPrice"), builder.sum(rootOrder.get("quantity")), rootItem.get("description"),rootItem.get("avatar"));
         query.groupBy(rootItem.get("id"));
