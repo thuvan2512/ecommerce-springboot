@@ -63,6 +63,18 @@ public class Utils {
         }
         return null;
     }
+
+    public String generatePromotionCode(String prefix){
+        try {
+            double randomDouble = Math.random();
+            randomDouble = randomDouble * 1000 + 1;
+            return prefix + String.format("%04d",(int)randomDouble);
+        }catch (Exception exception){
+            System.out.println(exception.getMessage());
+        }
+        return null;
+    }
+
     public String passwordEncoder(String password){
         try {
             return org.apache.commons.codec.digest.DigestUtils.sha256Hex(password);
@@ -152,7 +164,7 @@ public class Utils {
         return null;
     }
 
-    public String customMailForPayment(List<CartItem> cartItemList, Double shipFee){
+    public String customMailForPayment(List<CartItem> cartItemList, Double shipFee, Double totalDiscount){
         try {
             String content = "";
             Double total = this.cartService.getTotalPriceInCart(cartItemList.get(0).getCart());
@@ -176,7 +188,7 @@ public class Utils {
             }
             content += "    <tr style=\"border-bottom: 1px solid rgba(0,0,0,.05);\">\n"
                     + "                            <td valign=\"middle\" width=\"20%\" style=\"text-align:left; padding: 0 2.5em;\">\n"
-                    + String.format("<span class=\"price\" style=\"color: #000; font-size: 16px;\">Total: %,.0f VND + %,.0f VND (ship fee) = %,.0f VND</span>\n", total, shipFee, total+shipFee)
+                    + String.format("<span class=\"price\" style=\"color: #000; font-size: 16px;\">Total: %,.0f VND + %,.0f VND (ship fee) - %,.0f VND (voucher discount) = %,.0f VND</span>\n", total, shipFee, totalDiscount, total+shipFee-totalDiscount)
                     + "                            </td>\n"
                     + "                        </tr>";
             return content;
