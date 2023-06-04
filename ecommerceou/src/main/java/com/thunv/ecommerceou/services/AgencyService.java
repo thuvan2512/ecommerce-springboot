@@ -7,6 +7,7 @@ import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AgencyService {
     Agency getAgencyByID(int agencyID);
@@ -22,4 +23,5 @@ public interface AgencyService {
     Agency banAgency(int agencyID, boolean isAdmin);
     Agency unBanAgency(int agencyID);
     boolean deleteAgency(int agencyID);
+    Map<Object, Object> getGeneralStatsForAdminView();
 }
