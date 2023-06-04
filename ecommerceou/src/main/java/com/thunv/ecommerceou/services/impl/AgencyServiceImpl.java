@@ -14,7 +14,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AgencyServiceImpl implements AgencyService {
@@ -166,6 +168,46 @@ public class AgencyServiceImpl implements AgencyService {
         }catch (Exception ex){
             String error_ms = ex.getMessage();
             throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
+    public Map<Object, Object> getGeneralStatsForAdminView() throws RuntimeException{
+        try {
+            List<Agency> agencyList = getAllAgency();
+            int numOfActiveAgency = 0;
+            int numOfDeactivateAgency = 0;
+            int numOfBannedByAdmin = 0;
+            int numOfBanByHasExpired = 0;
+            int numOfUncensoredAgency = 0;
+            for (Agency agency: agencyList){
+                int state = agency.getIsActive();
+                int censoredState = agency.getIsCensored();
+                int banByAdmin = agency.getDeactivatedByAdmin();
+                if (state != 1){
+                    numOfDeactivateAgency += 1;
+                    if (censoredState == 0) {
+                        numOfUncensoredAgency += 1;
+                    }
+                    if (banByAdmin == 1){
+                        numOfBannedByAdmin += 1;
+                    }else {
+                        numOfBanByHasExpired += 1;
+                    }
+                }else {
+                    numOfActiveAgency += 1;
+                }
+            }
+            Map<Object, Object> results = new HashMap<>();
+            results.put("numOfActiveAgency", numOfActiveAgency);
+            results.put("numOfDeactivateAgency", numOfDeactivateAgency);
+            results.put("numOfBannedByAdmin", numOfBannedByAdmin);
+            results.put("numOfBannedByExpired", numOfBanByHasExpired);
+            results.put("numOfUncensoredAgency", numOfUncensoredAgency);
+            return results;
+        }catch (Exception ex){
+            System.out.println(ex.getMessage());
+            return new HashMap<>();
         }
     }
 }

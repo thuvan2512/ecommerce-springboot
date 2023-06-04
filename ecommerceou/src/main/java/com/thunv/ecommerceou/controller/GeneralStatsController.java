@@ -51,4 +51,22 @@ public class GeneralStatsController {
                 new ModelResponse(code, ms, list)
         );
     }
+
+    @GetMapping(value = "/view-admin")
+    public ResponseEntity<ModelResponse> getGeneralInfoOfAdmin() {
+        String ms = "Successfully !!!";
+        String code = "200";
+        Map<Object, Object> list = new HashMap<>();
+        HttpStatus status = HttpStatus.OK;
+        try {
+            list = this.agencyService.getGeneralStatsForAdminView();
+        } catch (Exception ex) {
+            ms = ex.getMessage();
+            code = "400";
+            status = HttpStatus.BAD_REQUEST;
+        }
+        return ResponseEntity.status(status).body(
+                new ModelResponse(code, ms, list)
+        );
+    }
 }
