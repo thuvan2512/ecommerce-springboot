@@ -134,6 +134,17 @@ public class SalePostRepositoryImpl implements SalePostRepositoryCustom {
     }
 
     @Override
+    public List<SalePost> getListSalePostByListID(List<Integer> listPostID) {
+        Session session = this.sessionFactoryBean.getObject().getCurrentSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<SalePost> query = builder.createQuery(SalePost.class);
+        Root rootSalePost = query.from(SalePost.class);
+        query.where(rootSalePost.get("id").in(listPostID));
+        Query q = session.createQuery(query);
+        return q.getResultList();
+    }
+
+    @Override
     public List<Object[]> getTopSellerByAgency(int top, Agency agency) {
         Session session = this.sessionFactoryBean.getObject().getCurrentSession();
         CriteriaBuilder builder = session.getCriteriaBuilder();

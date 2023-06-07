@@ -13,6 +13,7 @@ import java.util.List;
 public interface SalePostService {
     SalePost getSalePostByID(int postID);
     List<SalePost> getAllSalePost();
+    List<SalePost> getListSalePostByListID(List<Integer> listPostID);
     List<SalePost> searchSalePost(SearchSalePostDTO searchSalePostDTO);
 
     List<Object> getSuggestForSearchProducts(String keyword);

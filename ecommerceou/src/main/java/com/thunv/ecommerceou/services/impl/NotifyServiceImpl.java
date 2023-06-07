@@ -7,6 +7,7 @@ import com.thunv.ecommerceou.models.NotificationEntity;
 import com.thunv.ecommerceou.models.enumerate.NotificationImages;
 import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.FollowAgency;
+import com.thunv.ecommerceou.models.pojo.PromotionProgram;
 import com.thunv.ecommerceou.services.NotifyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -48,10 +49,27 @@ public class NotifyServiceImpl implements NotifyService {
         try {
             for (FollowAgency followAgency: followAgencyList){
                 String recipient = String.format("user-%s", followAgency.getAuthor().getId());
-                String title = "The agent you follow is about to post a new sale post";
-                String detail = String.format("Agent '%s' is about to have a new sale post with title '%s'.",
+                String title = "The merchant you follow is about to post a new sale post";
+                String detail = String.format("Merchant '%s' is about to have a new sale post with title '%s'.",
                         followAgency.getAgency().getName(), titlePost);
                 String type = "New Sale Post";
+                this.pushNotify(recipient, followAgency.getAgency().getAvatar(), title, detail, type);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    @Async
+    public void pushListFollowNotifyPromotionForUser(List<FollowAgency> followAgencyList, PromotionProgram promotionProgram) {
+        try {
+            for (FollowAgency followAgency: followAgencyList){
+                String recipient = String.format("user-%s", followAgency.getAuthor().getId());
+                String title = "The merchant you follow is about to post a new promotion program";
+                String detail = String.format("Merchant '%s' is about to have a new promotion program with title '%s'. View detail at merchant's page now !!!",
+                        followAgency.getAgency().getName(), promotionProgram.getProgramName());
+                String type = "New Promotion Program";
                 this.pushNotify(recipient, followAgency.getAgency().getAvatar(), title, detail, type);
             }
         } catch (Exception e) {

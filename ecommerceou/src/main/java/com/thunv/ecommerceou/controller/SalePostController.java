@@ -422,4 +422,24 @@ public class SalePostController {
                 new ModelResponse(code,ms,null)
         );
     }
+
+    @PostMapping(path = "/get-list-sale-post-by-list-id")
+    public ResponseEntity<ModelResponse> getListSalePostByListPostID(@RequestBody Map<String, List<Integer>> mapInput){
+        String ms = "successfully !!!";
+        String code = "200";
+        Object res = null;
+        try {
+            List<Integer> listPostID = mapInput.get("listSalePostID");
+            if (listPostID == null){
+                throw new RuntimeException("Invalid input. This is input template ---listSalePostID:[1, 2, 3]--");
+            }
+            res = this.salePostService.getListSalePostByListID(listPostID);
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
 }

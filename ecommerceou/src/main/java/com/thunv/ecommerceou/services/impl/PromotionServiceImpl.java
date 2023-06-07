@@ -5,6 +5,8 @@ import com.thunv.ecommerceou.repositories.CartItemRepository;
 import com.thunv.ecommerceou.repositories.CartRepository;
 import com.thunv.ecommerceou.repositories.PromotionCodeRepository;
 import com.thunv.ecommerceou.repositories.PromotionProgramRepository;
+import com.thunv.ecommerceou.services.FollowService;
+import com.thunv.ecommerceou.services.NotifyService;
 import com.thunv.ecommerceou.services.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,10 @@ public class PromotionServiceImpl implements PromotionService {
     private CartItemRepository cartItemRepository;
     @Autowired
     private CartRepository cartRepository;
+    @Autowired
+    private FollowService followService;
+    @Autowired
+    private NotifyService notifyService;
 
     @Override
     public PromotionProgram getPromotionProgramByID(Integer id) throws RuntimeException{
@@ -65,6 +71,8 @@ public class PromotionServiceImpl implements PromotionService {
 
     @Override
     public PromotionProgram createPromotionProgram(PromotionProgram promotionProgram) throws RuntimeException{
+        List<FollowAgency> followAgencyList = this.followService.getListFollowByAgency(promotionProgram.getAgency());
+        this.notifyService.pushListFollowNotifyPromotionForUser(followAgencyList, promotionProgram);
         return this.promotionProgramRepository.save(promotionProgram);
     }
 

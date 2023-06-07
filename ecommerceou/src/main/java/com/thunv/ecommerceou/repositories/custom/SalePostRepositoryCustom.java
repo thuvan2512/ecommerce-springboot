@@ -11,6 +11,8 @@ public interface SalePostRepositoryCustom {
     List<SalePost> searchSalePost(SearchSalePostDTO searchSalePostDTO);
     List<Object[]> getTopSeller(int top);
 
+    List<SalePost> getListSalePostByListID(List<Integer> listPostID);
+
     List<Object[]> getTopSellerByAgency(int top, Agency agency);
     List<Object[]> getStatsInfoOfCommentByPost(SalePost salePost);
     List<SalePost> getListSalePostLikeByUser(User user);
