@@ -57,6 +57,16 @@ public class SalePostServiceImpl implements SalePostService {
     }
 
     @Override
+    public List<SalePost> getListSalePostByListID(List<Integer> listPostID) throws RuntimeException{
+        try {
+            return this.salePostRepository.getListSalePostByListID(listPostID);
+        } catch (Exception ex) {
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
     public List<SalePost> searchSalePost(SearchSalePostDTO searchSalePostDTO) throws RuntimeException {
         try {
             return this.salePostRepository.searchSalePost(searchSalePostDTO);
