@@ -124,11 +124,13 @@ public class PromotionServiceImpl implements PromotionService {
                 discount += (total * percentDiscount > promotionProgram.getReductionAmountMax() ? promotionProgram.getReductionAmountMax(): total * percentDiscount);
             }
         }
-        if (discount > promotionProgram.getReductionAmountMax()){
-            if (promotionProgram.getReductionAmountMax() > totalPrice){
-                discount = totalPrice;
-            }else {
-                discount = promotionProgram.getReductionAmountMax() * 1.0;
+        if (promotionProgram != null){
+            if (discount > promotionProgram.getReductionAmountMax()){
+                if (promotionProgram.getReductionAmountMax() > totalPrice){
+                    discount = totalPrice;
+                }else {
+                    discount = promotionProgram.getReductionAmountMax() * 1.0;
+                }
             }
         }
         result.put("agencyID", agencyID);
