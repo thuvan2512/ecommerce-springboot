@@ -231,7 +231,11 @@ public class CartServiceImpl implements CartService {
                         }
                     }
                     if (discount > promotionProgram.getReductionAmountMax()){
-                        discount = promotionProgram.getReductionAmountMax() * 1.0;
+                        if (promotionProgram.getReductionAmountMax() > totalPrice){
+                            discount = totalPrice;
+                        }else {
+                            discount = promotionProgram.getReductionAmountMax() * 1.0;
+                        }
                     }
                     this.promotionService.useVoucher(promotionCode);
                     totalDiscount += discount;
