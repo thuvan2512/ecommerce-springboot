@@ -12,7 +12,7 @@ public interface CartService {
     List<CartItem> clearCart(User user);
     List<CartItem> paymentCart(User user, PaymentType paymentType, CustomerAddressBook customerAddressBook, Map<Integer, Map<String, String>> mapServiceInfo);
     List<Object> getCheckOutPayment(User user);
-    Map<String, String> getMomoPaymentInfo(User user, Double shipFee);
+    Map<String, String> getMomoPaymentInfo(User user, Double shipFee, Double discount);
     Cart getCartByUser(User user);
     Double getTotalPriceInCart(Cart cart);
 }

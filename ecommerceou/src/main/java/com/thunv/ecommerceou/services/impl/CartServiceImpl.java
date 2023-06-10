@@ -365,7 +365,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Map<String, String> getMomoPaymentInfo(User user, Double shipFee) throws RuntimeException{
+    public Map<String, String> getMomoPaymentInfo(User user, Double shipFee, Double discount) throws RuntimeException{
         Map<String, String> result = new HashMap<>();
         try {
             Map<String, String> res = null;
@@ -386,7 +386,7 @@ public class CartServiceImpl implements CartService {
             }
             if (cartItemList.size() > 0){
                 String id = this.utils.generateUUID();
-                int amount = (int)(double)(getTotalPriceInCart(cart) +  shipFee);
+                int amount = (int)(double)(getTotalPriceInCart(cart) +  shipFee - discount);
                 String amountStr = String.valueOf(amount);
                 System.out.println(amountStr);
                 res = this.momoPaymentUtils.getPaymentInfo(id, amountStr, orderInfo, id);
