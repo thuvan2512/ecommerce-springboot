@@ -57,7 +57,7 @@ public class PromotionProgram {
 
     @ManyToOne
     @JoinColumn(name = "agent_id",referencedColumnName = "id")
-    @JsonIgnore
+//    @JsonIgnore
     @Getter @Setter
     private Agency agency;
 
