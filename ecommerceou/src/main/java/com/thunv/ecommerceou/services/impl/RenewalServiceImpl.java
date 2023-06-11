@@ -41,6 +41,11 @@ public class RenewalServiceImpl implements RenewalService {
     }
 
     @Override
+    public RenewalPackage updateRenewalPackage(RenewalPackage renewalPackage) throws RuntimeException{
+        return this.renewalPackageRepository.save(renewalPackage);
+    }
+
+    @Override
     public RenewalManage getRenewalManageByID(int renewalManageID) throws RuntimeException{
         return this.renewalManageRepository.findById(renewalManageID).orElseThrow(() -> new RuntimeException("Can not find renewal manage with id = " + renewalManageID));
     }
