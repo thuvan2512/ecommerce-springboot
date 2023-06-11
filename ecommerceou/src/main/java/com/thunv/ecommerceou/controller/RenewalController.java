@@ -1,5 +1,6 @@
 package com.thunv.ecommerceou.controller;
 
+import com.thunv.ecommerceou.dto.RenewalPackageUpdateDTO;
 import com.thunv.ecommerceou.jwt.JwtTokenUtils;
 import com.thunv.ecommerceou.models.pojo.Agency;
 import com.thunv.ecommerceou.models.pojo.RenewalPackage;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +93,27 @@ public class RenewalController {
         Object res = null;
         try {
             res = this.renewalService.getListRenewalOrder();
+        }catch (Exception ex){
+            ms = ex.getMessage();
+            code = "400";
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ModelResponse(code,ms,res)
+        );
+    }
+
+    @PatchMapping(path = "/update-renewal-package/{packageID}")
+    public ResponseEntity<ModelResponse> updateRenewal(@PathVariable(value = "packageID") String packageID,
+            @RequestBody RenewalPackageUpdateDTO renewalPackageUpdateDTO){
+        String ms = "Successfully";
+        String code = "200";
+        Object res = null;
+        try {
+            RenewalPackage renewalPackage = this.renewalService.getRenewalPackageByID(Integer.parseInt(packageID));
+            if (renewalPackageUpdateDTO != null){
+                renewalPackage = renewalPackageUpdateDTO.loadRenewalPackage(renewalPackage);
+                this.renewalService.updateRenewalPackage(renewalPackage);
+            }
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";

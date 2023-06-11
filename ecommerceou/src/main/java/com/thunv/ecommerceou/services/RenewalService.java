@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface RenewalService {
     boolean checkRenewalManageExist(int renewalManageID);
+    RenewalPackage updateRenewalPackage(RenewalPackage renewalPackage);
     RenewalManage getRenewalManageByID(int renewalManageID);
     RenewalManage getRenewalManageByAgencyID(int agencyID);
     RenewalPackage getRenewalPackageByID(int renewalPackageID);
