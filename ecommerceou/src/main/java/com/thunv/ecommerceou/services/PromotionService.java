@@ -17,6 +17,7 @@ public interface PromotionService {
     List<PromotionProgram> getALLProgramByAgency(Agency agency);
     List<PromotionProgram> getAllPublishProgram();
     PromotionProgram createPromotionProgram(PromotionProgram promotionProgram);
+    PromotionProgram updatePromotionProgram(PromotionProgram promotionProgram);
     boolean checkExistCode(String code);
     PromotionCode createPromotionCode(PromotionCode promotionCode);
 

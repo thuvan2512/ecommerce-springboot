@@ -77,6 +77,11 @@ public class PromotionServiceImpl implements PromotionService {
     }
 
     @Override
+    public PromotionProgram updatePromotionProgram(PromotionProgram promotionProgram) throws RuntimeException{
+        return this.promotionProgramRepository.save(promotionProgram);
+    }
+
+    @Override
     public boolean checkExistCode(String code) throws RuntimeException{
         List<PromotionCode> promotionCodeList = this.promotionCodeRepository.findByCode(code);
         if (promotionCodeList.size() > 0){
