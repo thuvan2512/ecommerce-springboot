@@ -135,7 +135,7 @@ public class PromotionController {
         try {
             PromotionProgram promotionProgram = this.promotionService.getPromotionProgramByID(Integer.parseInt(programID));
             promotionProgram = promotionProgramUpdateDTO.loadPromotionProgram(promotionProgram);
-            this.promotionService.createPromotionProgram(promotionProgram);
+            this.promotionService.updatePromotionProgram(promotionProgram);
         }catch (Exception ex){
             ms = ex.getMessage();
             code = "400";
