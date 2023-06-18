@@ -198,11 +198,12 @@ public class AgencyServiceImpl implements AgencyService {
                     numOfDeactivateAgency += 1;
                     if (censoredState == 0) {
                         numOfUncensoredAgency += 1;
-                    }
-                    if (banByAdmin == 1){
-                        numOfBannedByAdmin += 1;
                     }else {
-                        numOfBanByHasExpired += 1;
+                        if (banByAdmin == 1){
+                            numOfBannedByAdmin += 1;
+                        }else {
+                            numOfBanByHasExpired += 1;
+                        }
                     }
                 }else {
                     numOfActiveAgency += 1;
