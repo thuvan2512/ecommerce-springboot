@@ -13,6 +13,7 @@ public interface AgencyService {
     Agency getAgencyByID(int agencyID);
     Agency getAgencyByUserID(int userID);
     List<Agency> getAllAgency();
+    List<Agency> getAllAgencyForStats();
     List<Object[]> getTopAgency(int top);
     List<Agency> searchAgency(SearchAgencyDTO searchAgencyDTO);
     List<Agency> getListAgencyFollowByUser(User user);

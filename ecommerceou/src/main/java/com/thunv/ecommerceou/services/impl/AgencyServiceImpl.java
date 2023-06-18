@@ -56,6 +56,16 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    public List<Agency> getAllAgencyForStats()  throws RuntimeException{
+        try {
+            return this.agencyRepository.findAll();
+        }catch (Exception ex){
+            String error_ms = ex.getMessage();
+            throw new RuntimeException(error_ms);
+        }
+    }
+
+    @Override
     public List<Object[]> getTopAgency(int top) throws RuntimeException{
         try {
             return this.agencyRepository.getTopAgency(top);
@@ -174,7 +184,7 @@ public class AgencyServiceImpl implements AgencyService {
     @Override
     public Map<Object, Object> getGeneralStatsForAdminView() throws RuntimeException{
         try {
-            List<Agency> agencyList = getAllAgency();
+            List<Agency> agencyList = getAllAgencyForStats();
             int numOfActiveAgency = 0;
             int numOfDeactivateAgency = 0;
             int numOfBannedByAdmin = 0;
